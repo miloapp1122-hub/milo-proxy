@@ -13,8 +13,7 @@ HGI_CLAVE = "C9871"
 HGI_COMPANIA = "1"
 HGI_EMPRESA = "1"
 
-_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjoiOTg3MTEwMjUiLCJjbGF2ZSI6IkM5ODcxIiwiY29kX2NvbXBhbmlhIjoiMSIsImNvZF9lbXByZXNhIjoiMSIsImVzdGFkbyI6IjEiLCJpZF9hcGxpY2F0aXZvIjoiMTEiLCJpZF9hcGxpY2F0aXZvX3BldGljaW9uIjoiMTEiLCJuYmYiOjE3NzU4NjMyMzYsImV4cCI6MTc3NTg4NDIzNiwiaWF0IjoxNzU4NjMyMzZ9.ZvBZHZ8Awu9JxtnKPz1lWZgYdUeWt162McGEL511E_E"
-
+_token = None
 def renovar_token():
     global _token
     url = f"{HGI_BASE}/Autenticar?usuario={HGI_USUARIO}&clave={HGI_CLAVE}&cod_compania={HGI_COMPANIA}&cod_empresa={HGI_EMPRESA}"
