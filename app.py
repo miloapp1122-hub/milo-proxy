@@ -99,19 +99,12 @@ def hgi_token():
     print(f'[Login] Usuario: {u}')
     try:
         # HGI requiere form-urlencoded con grant_type=password
-        # Intentar con http si https falla
-        url = f'{HGI_BASE}/token'
-        payload = f'grant_type=password&username={u}&password={p}'
-        r = requests.post(
-            url,
-            data=payload,
-            headers={
-                'Content-Type':'application/x-www-form-urlencoded',
-                'Accept':'application/json'
-            },
+        # HGI usa GET con params para autenticar
+        r = requests.get(
+            f'{HGI_BASE}/Autenticar',
+            params={'usuario':u,'clave':p,'cod_compania':'1','cod_empresa':'1'},
             timeout=20,
-            verify=False,
-            allow_redirects=True
+            verify=False
         )
         print(f'[Login] Status HGI: {r.status_code}')
         print(f'[Login] Respuesta: {r.text[:300]}')
