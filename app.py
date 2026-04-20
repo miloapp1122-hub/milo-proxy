@@ -250,10 +250,20 @@ def mensajeros_novedad():
     }
     return jsonify({'ok': True, 'timestamp': ts, 'resultados': res})
 
-# ─── ARRANQUE ──────────────────────────────────────────────
-t = threading.Thread(target=renovar_token, daemon=True)
-t.start()
+# ─── ARRANQUE DEL THREAD ──────────────────────────────────
+_thread_iniciado = False
+
+@app.before_request
+def iniciar_thread():
+    global _thread_iniciado
+    if not _thread_iniciado:
+        _thread_iniciado = True
+        t = threading.Thread(target=renovar_token, daemon=True)
+        t.start()
+        print('[MILO] Thread de token iniciado')
 
 if __name__ == '__main__':
+    t = threading.Thread(target=renovar_token, daemon=True)
+    t.start()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
