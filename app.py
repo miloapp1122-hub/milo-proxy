@@ -440,6 +440,55 @@ def mensajeros_novedad():
     return jsonify({'ok': True, 'timestamp': ts, 'resultados': resultados})
 
 
+# ─── PROXY HGI (evita CORS del navegador) ─────────────────
+
+HGI_BASE = 'https://900405097.hginet.com.co/Api'
+
+@app.route('/hgi/token', methods=['POST'])
+def hgi_token():
+    """Proxy para obtener token HGI — evita bloqueo CORS"""
+    datos = request.get_json()
+    usuario = datos.get('username', '')
+    clave   = datos.get('password', '')
+    try:
+        r = requests.post(
+            f'{HGI_BASE}/token',
+            data=f'grant_type=password&username={usuario}&password={clave}',
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            timeout=15,
+            verify=False
+        )
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/hgi/<path:endpoint>', methods=['GET', 'POST'])
+def hgi_proxy(endpoint):
+    """Proxy genérico para todas las llamadas a HGI"""
+    token = request.headers.get('X-HGI-Token', '')
+    headers = {'Authorization': f'Bearer {token}'}
+    try:
+        if request.method == 'GET':
+            r = requests.get(
+                f'{HGI_BASE}/{endpoint}',
+                params=request.args,
+                headers=headers,
+                timeout=15,
+                verify=False
+            )
+        else:
+            r = requests.post(
+                f'{HGI_BASE}/{endpoint}',
+                json=request.get_json(),
+                headers=headers,
+                timeout=15,
+                verify=False
+            )
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # ─── HEALTH CHECK ──────────────────────────────────────────
 @app.route('/', methods=['GET'])
 def health():
