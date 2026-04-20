@@ -99,20 +99,21 @@ def hgi_token():
     print(f'[Login] Usuario: {u}')
     try:
         # HGI requiere form-urlencoded con grant_type=password
-        # HGI usa GET con params para autenticar
+        # HGI autenticación con GET y params
         r = requests.get(
             f'{HGI_BASE}/Autenticar',
             params={'usuario':u,'clave':p,'cod_compania':'1','cod_empresa':'1'},
             timeout=20,
             verify=False
         )
+        data = r.json()
+        # Mapear JwtToken a access_token para que el frontend lo entienda
+        if data.get('JwtToken') and not data.get('Error'):
+            data['access_token'] = data['JwtToken']
+        return jsonify(data), 200
         print(f'[Login] Status HGI: {r.status_code}')
         print(f'[Login] Respuesta: {r.text[:300]}')
-        data = r.json()
-        # HGI devuelve JwtToken, lo mapeamos a access_token también
-        if 'JwtToken' in data:
-            data['access_token'] = data['JwtToken']
-        return jsonify(data), r.status_code
+
     except Exception as e:
         print(f'[Login] ERROR: {e}')
         return jsonify({'error':str(e)}), 500
