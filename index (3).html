@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0F6E56"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Milo"/>
+<title>Milo · Plataforma LubriAndes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f3;min-height:100vh;max-width:480px;margin:0 auto;position:relative}
+:root{
+  --verde:#0F6E56;--verde-claro:#1D9E75;--verde-bg:#EAF3DE;--verde-text:#3B6D11;
+  --rojo:#E24B4A;--rojo-bg:#FCEBEB;--rojo-text:#A32D2D;
+  --azul:#185FA5;--azul-bg:#E6F1FB;--azul-text:#0C447C;
+  --ambar:#BA7517;--ambar-bg:#FAEEDA;--ambar-text:#854F0B;
+  --gris:#f0f4f3;--borde:#e0e7e5
+}
+
+/* HEADER */
+.header{background:var(--verde);color:white;padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.logo{width:34px;height:34px;border-radius:9px;background:white;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--verde);flex-shrink:0}
+.header-text h1{font-size:18px;font-weight:600;line-height:1}
+.header-text p{font-size:11px;opacity:.8;margin-top:1px}
+.btn-back{background:rgba(255,255,255,.2);border:none;color:white;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;margin-right:4px}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;min-height:calc(100vh - 58px)}
+.screen.active{display:flex}
+
+/* TABS */
+.tabs{display:flex;background:white;border-bottom:1px solid var(--borde);position:sticky;top:58px;z-index:99;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:70px;padding:10px 4px;font-size:11px;text-align:center;color:#888;cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap}
+.tab.active{color:var(--verde);border-bottom-color:var(--verde);font-weight:600}
+
+/* CARDS */
+.body{padding:12px;flex:1}
+.card{background:white;border-radius:14px;border:1px solid var(--borde);padding:14px;margin-bottom:12px}
+.card-title{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+
+/* FORMS */
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;color:#666;margin-bottom:4px;font-weight:500}
+input[type=text],input[type=date],input[type=password],input[type=number],select,textarea{
+  width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--borde);
+  border-radius:10px;background:white;color:#222;outline:none;
+  -webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--verde)}
+textarea{resize:none;height:60px}
+
+/* BUTTONS */
+.btn-primary{width:100%;padding:13px;background:var(--verde);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}
+.btn-primary:active{opacity:.85}
+.btn-secondary{width:100%;padding:11px;background:transparent;color:var(--verde);border:1.5px solid var(--verde);border-radius:12px;font-size:14px;cursor:pointer;margin-top:8px}
+.btn-outline{padding:8px 16px;background:transparent;color:var(--verde);border:1px solid var(--verde);border-radius:9px;font-size:13px;cursor:pointer}
+.btn-danger{width:100%;padding:11px;background:transparent;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:12px;font-size:14px;cursor:pointer;margin-top:8px}
+
+/* STEPS */
+.steps{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;background:white;border-bottom:1px solid var(--borde)}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#ddd}
+.step-dot.done{background:var(--verde)}
+.step-dot.active{background:var(--verde);width:20px;border-radius:4px}
+
+/* GPS */
+.gps-badge{display:inline-flex;align-items:center;gap:6px;background:var(--verde-bg);color:var(--verde-text);font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid #c5e0b4;margin-top:6px}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:var(--verde-claro);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* SCANNER */
+.scan-box{background:#f8faf9;border-radius:12px;border:1.5px dashed #b0cfc7;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:10px}
+.scan-icon-wrap{width:52px;height:52px;border-radius:12px;background:var(--verde-bg);display:flex;align-items:center;justify-content:center}
+.btn-scan{padding:9px 22px;background:var(--verde);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.manual-row{display:flex;gap:6px;width:100%}
+.manual-row input{flex:1}
+.manual-row button{padding:9px 14px;background:#f0f4f3;border:1px solid var(--borde);border-radius:10px;font-size:12px;cursor:pointer;white-space:nowrap;color:#444}
+
+/* PRODUCTOS */
+.prod-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f0f4f3}
+.prod-row:last-child{border-bottom:none}
+.prod-info{flex:1}
+.prod-name{font-size:13px;font-weight:600;color:#222}
+.prod-meta{font-size:11px;color:#888;margin-top:1px}
+.qty-wrap{display:flex;align-items:center;gap:6px}
+.qty-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--borde);background:#f8f9fa;color:#222;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.qty-num{width:28px;text-align:center;font-size:14px;font-weight:700;color:var(--verde)}
+
+/* LISTA CLIENTES / PRODUCTOS SEARCH */
+.search-item{padding:10px 12px;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.search-item:hover{background:#f8faf9}
+.search-item:last-child{border-bottom:none}
+.si-name{font-size:14px;font-weight:600;color:#222}
+.si-meta{font-size:11px;color:#888;margin-top:1px}
+
+/* BADGES Y CHIPS */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px}
+.badge-green{background:var(--verde-bg);color:var(--verde-text)}
+.badge-blue{background:var(--azul-bg);color:var(--azul-text)}
+.badge-red{background:var(--rojo-bg);color:var(--rojo-text)}
+.badge-amber{background:var(--ambar-bg);color:var(--ambar-text)}
+.badge-scan{background:#E6F1FB;color:#185FA5;font-size:10px;padding:2px 7px;border-radius:5px;margin-left:5px}
+.chip{display:inline-block;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600}
+.chip-green{background:var(--verde-bg);color:var(--verde-text)}
+.chip-blue{background:var(--azul-bg);color:var(--azul)}
+.chip-gray{background:#f0f4f3;color:#666}
+.chip-red{background:var(--rojo-bg);color:var(--rojo-text)}
+.chip-amber{background:var(--ambar-bg);color:var(--ambar-text)}
+
+/* RESUMEN */
+.sum-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #f5f5f5}
+.sum-row:last-child{border-bottom:none}
+.sum-total{display:flex;justify-content:space-between;padding:10px 0 0;font-size:16px;font-weight:700}
+
+/* HGI STATUS */
+.hgi-banner{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--verde-bg);border-radius:10px;border:1px solid #c5e0b4;margin-bottom:10px}
+.hgi-icon{width:32px;height:32px;border-radius:50%;background:var(--verde);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* SUCCESS */
+.success-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;text-align:center}
+.success-circle{width:72px;height:72px;border-radius:50%;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+
+/* LOADING */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
+.loading-overlay.show{display:flex}
+.loading-card{background:white;border-radius:16px;padding:28px 32px;text-align:center;min-width:220px}
+.spinner{width:36px;height:36px;border:3px solid #e0e7e5;border-top-color:var(--verde);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:white;padding:10px 20px;border-radius:10px;font-size:13px;z-index:1000;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* SCANNER VIDEO */
+#scanner-container{display:none;position:fixed;inset:0;background:black;z-index:998;flex-direction:column;align-items:center;justify-content:center}
+#scanner-container.show{display:flex}
+#scanner-container video,#scanner-container canvas{max-width:100%;max-height:70vh}
+.scanner-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:250px;height:120px;border:2px solid #1D9E75;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,.5)}
+.scanner-line{position:absolute;top:50%;left:0;right:0;height:2px;background:var(--verde-claro);animation:scan 2s linear infinite}
+@keyframes scan{0%{top:10%}100%{top:90%}}
+.btn-close-scan{position:absolute;bottom:40px;padding:12px 32px;background:white;color:#222;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}
+
+/* LOGIN */
+.login-bg{background:var(--verde);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;min-height:100vh}
+.login-logo{width:80px;height:80px;border-radius:20px;background:white;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.login-logo span{font-size:32px;font-weight:800;color:var(--verde)}
+
+/* VENDEDOR ITEM */
+.vend-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5}
+.vend-row:last-child{border-bottom:none}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--azul-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--azul);flex-shrink:0}
+
+/* BOTTOM BAR */
+.bottom-bar{padding:12px 16px;background:white;border-top:1px solid var(--borde);position:sticky;bottom:0}
+
+/* METRIC CARDS */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.metric{background:white;border-radius:12px;border:1px solid var(--borde);padding:12px}
+.metric-label{font-size:11px;color:#888;margin-bottom:3px}
+.metric-value{font-size:24px;font-weight:700;color:var(--verde)}
+
+/* CARTERA ESTILOS */
+.factura-row{padding:10px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:flex-start;gap:8px}
+.factura-row:last-child{border-bottom:none}
+.factura-info{flex:1}
+.factura-num{font-size:13px;font-weight:600;color:#222}
+.factura-meta{font-size:11px;color:#888;margin-top:2px}
+.factura-monto{text-align:right}
+.factura-valor{font-size:14px;font-weight:700;color:#222}
+.factura-dias{font-size:11px;margin-top:2px}
+.dias-ok{color:var(--verde-text)}
+.dias-warn{color:var(--ambar-text)}
+.dias-venc{color:var(--rojo-text)}
+.cartera-resumen{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.c-metric{background:white;border-radius:10px;border:1px solid var(--borde);padding:10px;text-align:center}
+.c-metric-label{font-size:10px;color:#888;margin-bottom:3px}
+.c-metric-val{font-size:16px;font-weight:700}
+.gestion-btn{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--borde);background:white;cursor:pointer;width:100%;margin-bottom:8px;font-size:13px;font-weight:500;color:#222}
+.gestion-btn:last-child{margin-bottom:0}
+.gestion-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+
+/* MENSAJEROS ESTILOS */
+.despacho-card{background:white;border-radius:12px;border:1px solid var(--borde);padding:12px;margin-bottom:10px}
+.despacho-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.despacho-num{font-size:13px;font-weight:700;color:#222}
+.despacho-cliente{font-size:12px;color:#666;margin-bottom:6px}
+.despacho-detalle{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.mensajero-avatar{width:40px;height:40px;border-radius:50%;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--verde-text);flex-shrink:0}
+.estado-timeline{display:flex;align-items:center;gap:4px;margin-top:8px}
+.et-step{flex:1;height:4px;border-radius:2px;background:#e0e7e5}
+.et-step.done{background:var(--verde)}
+.et-step.active{background:var(--verde-claro)}
+.et-labels{display:flex;justify-content:space-between;margin-top:4px}
+.et-label{font-size:9px;color:#aaa}
+.et-label.done{color:var(--verde-text)}
+.et-label.active{color:var(--verde);font-weight:600}
+.novedad-item{padding:8px 10px;background:#f8faf9;border-radius:8px;margin-bottom:6px;font-size:12px;color:#555;border-left:3px solid var(--borde)}
+.novedad-item.urgente{border-left-color:var(--rojo);background:var(--rojo-bg)}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <p id="loading-msg" style="font-size:14px;color:#444">Conectando con HGI...</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SCANNER -->
+<div id="scanner-container">
+  <div id="interactive" class="viewport"></div>
+  <div class="scanner-overlay"><div class="scanner-line"></div></div>
+  <button class="btn-close-scan" onclick="cerrarScanner()">Cancelar</button>
+</div>
+
+<!-- HEADER -->
+<div class="header" id="app-header">
+  <div class="logo">M</div>
+  <div class="header-text">
+    <h1>Milo</h1>
+    <p id="header-sub">Cargando...</p>
+  </div>
+</div>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="s-login" class="screen active">
+  <div class="login-bg">
+    <div class="login-logo"><span>M</span></div>
+    <p style="color:white;font-size:24px;font-weight:700;margin-bottom:4px">Milo</p>
+    <p style="color:rgba(255,255,255,.75);font-size:13px;margin-bottom:32px">Plataforma de gestión · LubriAndes</p>
+    <div style="width:100%;max-width:320px">
+      <div class="field"><input type="text" id="login-usuario" placeholder="Usuario HGI" value="98711025" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);color:white"/></div>
+      <div class="field"><input type="password" id="login-clave" placeholder="Contraseña" value="C9871" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);color:white"/></div>
+      <button onclick="hacerLogin()" style="width:100%;padding:14px;background:white;color:var(--verde);border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="s-dash" class="screen">
+  <div class="tabs">
+    <button class="tab active" onclick="dashTab(this,'dt-inicio')">Inicio</button>
+    <button class="tab" onclick="dashTab(this,'dt-asesores')">Asesores</button>
+    <button class="tab" onclick="dashTab(this,'dt-catalogo')">Catálogo</button>
+    <button class="tab" onclick="dashTab(this,'dt-cartera')">💰 Cartera</button>
+    <button class="tab" onclick="dashTab(this,'dt-mensajeros')">🚚 Mensajeros</button>
+  </div>
+  <div class="body">
+
+    <!-- TAB INICIO -->
+    <div id="dt-inicio">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Pedidos hoy</div><div class="metric-value" id="m-pedidos">0</div></div>
+        <div class="metric"><div class="metric-label">Total del día</div><div class="metric-value" id="m-total">$0</div></div>
+      </div>
+      <div class="card">
+        <p class="card-title">Accesos rápidos</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
+          <button onclick="irPaso1()" style="padding:12px 8px;background:var(--verde);color:white;border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">📦 Nuevo pedido</button>
+          <button onclick="irCartera()" style="padding:12px 8px;background:var(--azul-bg);color:var(--azul-text);border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">💰 Ver cartera</button>
+          <button onclick="irMensajeros()" style="padding:12px 8px;background:var(--ambar-bg);color:var(--ambar-text);border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">🚚 Mensajeros</button>
+          <button onclick="irGestionCartera()" style="padding:12px 8px;background:var(--verde-bg);color:var(--verde-text);border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">📋 Gestión</button>
+        </div>
+      </div>
+      <div class="card">
+        <p class="card-title">Últimos pedidos</p>
+        <div id="lista-pedidos-dash">
+          <p style="font-size:13px;color:#888;text-align:center;padding:10px">Sin pedidos hoy</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB ASESORES -->
+    <div id="dt-asesores" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="buscar-vendedor" placeholder="Buscar asesor..." oninput="filtrarVendedores()" style="flex:1"/>
+        <button class="btn-outline" onclick="cargarVendedores()">↻</button>
+      </div>
+      <div class="card" id="lista-vendedores">
+        <p style="font-size:13px;color:#888;text-align:center;padding:10px">Cargando asesores...</p>
+      </div>
+    </div>
+
+    <!-- TAB CATÁLOGO -->
+    <div id="dt-catalogo" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="buscar-producto-cat" placeholder="Buscar producto o código..." oninput="filtrarCatalogo()" style="flex:1"/>
+        <button class="btn-outline" onclick="cargarCatalogo()">↻</button>
+      </div>
+      <div class="card" id="lista-catalogo">
+        <p style="font-size:13px;color:#888;text-align:center;padding:10px">Cargando catálogo...</p>
+      </div>
+    </div>
+
+    <!-- TAB CARTERA -->
+    <div id="dt-cartera" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="buscar-cartera-q" placeholder="NIT o nombre del cliente..." style="flex:1" onkeydown="if(event.key==='Enter')buscarCarteraDash()"/>
+        <button class="btn-outline" onclick="buscarCarteraDash()">Buscar</button>
+      </div>
+      <div id="resultado-cartera-dash">
+        <p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Busca un cliente para ver su estado de cartera</p>
+      </div>
+      <button class="btn-primary" onclick="irCartera()" style="margin-top:4px">Módulo completo de cartera →</button>
+    </div>
+
+    <!-- TAB MENSAJEROS -->
+    <div id="dt-mensajeros" style="display:none">
+      <div id="resumen-despachos-dash">
+        <p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Cargando despachos del día...</p>
+      </div>
+      <button class="btn-primary" onclick="irMensajeros()" style="margin-top:4px">Módulo completo de mensajeros →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PASO 1: CLIENTE ==================== -->
+<div id="s-paso1" class="screen">
+  <div class="steps">
+    <div class="step-dot active" id="dot1-1"></div>
+    <div class="step-dot" id="dot1-2"></div>
+    <div class="step-dot" id="dot1-3"></div>
+  </div>
+  <div class="body">
+    <div class="card">
+      <p class="card-title">Asesor responsable</p>
+      <div class="field"><label>Seleccionar asesor</label>
+        <select id="sel-asesor"></select>
+      </div>
+      <div class="field"><label>Zona / Transacción</label>
+        <select id="sel-transaccion">
+          <option value="098">098 - Oriente Antioqueño Cercano</option>
+          <option value="091">091 - Dosquebradas</option>
+          <option value="099">099 - Valle de Aburrá</option>
+          <option value="09">09 - Pedido estándar con precios</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <p class="card-title">Buscar cliente en HGI</p>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" id="buscar-nit" placeholder="NIT o nombre del cliente" style="flex:1"/>
+        <button class="btn-outline" onclick="buscarCliente()">Buscar</button>
+      </div>
+      <div id="resultados-clientes" style="display:none">
+        <div class="card" style="margin:0;padding:0;max-height:200px;overflow-y:auto" id="lista-clientes-search"></div>
+      </div>
+      <p style="font-size:11px;color:#aaa;text-align:center;margin-top:6px">— o ingresa los datos manualmente —</p>
+      <button class="btn-secondary" style="margin-top:6px" onclick="mostrarFormCliente()">✏️ Ingresar cliente manualmente</button>
+    </div>
+    <div class="card" id="card-cliente-sel">
+      <p class="card-title">Datos del cliente</p>
+      <div class="field"><label>Razón social *</label><input type="text" id="cli-nombre" placeholder="Nombre o razón social del cliente"/></div>
+      <div class="field"><label>NIT / Cédula *</label><input type="text" id="cli-nit" placeholder="Ej: 900123456-1"/></div>
+      <div class="field"><label>Dirección de entrega</label><input type="text" id="cli-direccion" placeholder="Dirección donde se entrega el pedido"/></div>
+      <div class="field"><label>Forma de pago</label>
+        <select id="cli-pago">
+          <option value="1">Contado</option>
+          <option value="2">Crédito 30 días</option>
+          <option value="3">Crédito 60 días</option>
+          <option value="4">Crédito 90 días</option>
+        </select>
+      </div>
+      <div class="field"><label>Fecha de entrega</label><input type="date" id="cli-fecha"/></div>
+    </div>
+    <div class="card" id="card-cartera-cliente" style="display:none;padding:0;overflow:hidden">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--borde)">
+        <p class="card-title" style="margin:0">📊 Estado de cartera</p>
+      </div>
+      <div id="cartera-cliente-contenido">
+        <p style="font-size:13px;color:#888;text-align:center;padding:14px">⏳ Consultando...</p>
+      </div>
+    </div>
+    <div class="card">
+      <p class="card-title">Ubicación GPS</p>
+      <p style="font-size:12px;color:#666">Coordenadas capturadas automáticamente</p>
+      <div class="gps-badge" id="gps-badge"><div class="gps-dot"></div><span id="gps-text">Obteniendo ubicación...</span></div>
+    </div>
+  </div>
+  <div class="bottom-bar">
+    <button class="btn-primary" onclick="irPaso2()">Continuar → Productos</button>
+    <button class="btn-secondary" onclick="ir('s-dash')">Cancelar</button>
+  </div>
+</div>
+
+<!-- ==================== PASO 2: PRODUCTOS ==================== -->
+<div id="s-paso2" class="screen">
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="body">
+    <div class="card">
+      <p class="card-title">Agregar producto</p>
+      <div class="scan-box">
+        <div class="scan-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" stroke-width="2">
+            <rect x="3" y="3" width="4" height="4"/><rect x="17" y="3" width="4" height="4"/><rect x="3" y="17" width="4" height="4"/>
+            <line x1="9" y1="4" x2="15" y2="4"/><line x1="4" y1="9" x2="4" y2="15"/>
+            <line x1="20" y1="9" x2="20" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/>
+            <line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>
+          </svg>
+        </div>
+        <p style="font-size:12px;color:#666;text-align:center">Escanea el código de barras del producto</p>
+        <button class="btn-scan" onclick="abrirScanner()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Activar cámara
+        </button>
+      </div>
+      <p style="font-size:11px;color:#888;text-align:center;margin-bottom:8px">— o ingresar manualmente —</p>
+      <div class="manual-row">
+        <input type="text" id="input-ean" placeholder="Código de barras / código producto"/>
+        <button onclick="buscarPorEAN()">Buscar</button>
+      </div>
+      <div id="resultado-scan" style="display:none;margin-top:10px;padding:10px;border-radius:10px"></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <p class="card-title" style="margin:0">Productos en el pedido</p>
+        <span id="badge-items" style="font-size:11px;color:#888">0 ítems</span>
+      </div>
+      <div id="lista-items">
+        <p style="font-size:13px;color:#888;text-align:center;padding:10px" id="msg-sin-items">Sin productos agregados</p>
+      </div>
+    </div>
+    <div class="card">
+      <p class="card-title">Condiciones comerciales</p>
+      <div class="field"><label>% Descuento global</label><input type="text" id="descuento-global" placeholder="0" value="0"/></div>
+      <div class="field"><label>Observaciones</label><textarea id="observaciones" placeholder="Indicaciones especiales para el pedido..."></textarea></div>
+    </div>
+  </div>
+  <div class="bottom-bar">
+    <button class="btn-primary" onclick="irPaso3()">Continuar → Resumen</button>
+  </div>
+</div>
+
+<!-- ==================== PASO 3: RESUMEN ==================== -->
+<div id="s-paso3" class="screen">
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+  </div>
+  <div class="body">
+    <div class="hgi-banner">
+      <div class="hgi-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--verde-text)">Conectado a HGI ERP</div>
+        <div style="font-size:11px;color:#639922">Listo para registrar el pedido automáticamente</div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="card-title">Resumen del pedido</p>
+      <div id="resumen-datos"></div>
+    </div>
+    <div class="card">
+      <p class="card-title">Productos</p>
+      <div id="resumen-productos"></div>
+      <div class="sum-total"><span>Total</span><span style="color:var(--verde)" id="resumen-total">$0</span></div>
+    </div>
+  </div>
+  <div class="bottom-bar">
+    <button class="btn-primary" onclick="enviarPedido()">Enviar pedido a HGI →</button>
+    <button class="btn-secondary" onclick="ir('s-paso2')">← Editar productos</button>
+  </div>
+</div>
+
+<!-- ==================== ÉXITO PEDIDO ==================== -->
+<div id="s-exito" class="screen">
+  <div class="success-wrap">
+    <div class="success-circle">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <p style="font-size:22px;font-weight:700;color:#222;margin-bottom:8px">¡Pedido registrado!</p>
+    <p style="font-size:14px;color:#666;margin-bottom:22px">Creado automáticamente en HGI ERP</p>
+    <div style="background:#f8faf9;border-radius:14px;border:1px solid var(--borde);padding:16px;width:100%;max-width:320px;margin-bottom:20px">
+      <div class="sum-row"><span>Nro. pedido HGI</span><span style="font-weight:700;color:var(--verde)" id="exito-nro">#PED-...</span></div>
+      <div class="sum-row"><span>Cliente</span><span style="font-weight:600" id="exito-cliente"></span></div>
+      <div class="sum-row"><span>Asesor</span><span style="font-weight:600" id="exito-asesor"></span></div>
+      <div class="sum-row"><span>Total</span><span style="font-weight:700" id="exito-total"></span></div>
+      <div class="sum-row" style="border:none"><span>GPS</span><span style="font-size:11px;color:#888" id="exito-gps"></span></div>
+    </div>
+    <button class="btn-primary" style="max-width:280px" onclick="nuevoPedido()">+ Nuevo pedido</button>
+    <button class="btn-secondary" style="max-width:280px" onclick="ir('s-dash')">Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ==================== MÓDULO CARTERA ==================== -->
+<div id="s-cartera" class="screen">
+  <div class="tabs">
+    <button class="tab active" onclick="carteraTab(this,'ct-buscar')">🔍 Consulta</button>
+    <button class="tab" onclick="carteraTab(this,'ct-gestion')">📋 Gestión</button>
+    <button class="tab" onclick="carteraTab(this,'ct-historial')">📁 Historial</button>
+  </div>
+  <div class="body">
+
+    <!-- TAB CONSULTA -->
+    <div id="ct-buscar">
+      <div class="card">
+        <p class="card-title">Consultar cartera de cliente</p>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="text" id="cartera-nit-input" placeholder="NIT o nombre del cliente" style="flex:1" onkeydown="if(event.key==='Enter')consultarCartera()"/>
+          <button class="btn-outline" onclick="consultarCartera()">Buscar</button>
+        </div>
+      </div>
+      <div id="cartera-resultado">
+        <div style="text-align:center;padding:30px 20px;background:white;border-radius:14px;border:1px solid var(--borde)">
+          <div style="font-size:36px;margin-bottom:10px">💰</div>
+          <p style="font-size:14px;color:#888">Ingresa un NIT o nombre para consultar el estado de cartera del cliente</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB GESTIÓN -->
+    <div id="ct-gestion" style="display:none">
+      <div class="card">
+        <p class="card-title">Registrar gestión de cobro</p>
+        <div class="field"><label>NIT del cliente</label>
+          <input type="text" id="gest-nit" placeholder="NIT del cliente"/>
+        </div>
+        <div class="field"><label>Tipo de gestión</label>
+          <select id="gest-tipo">
+            <option value="llamada">📞 Llamada telefónica</option>
+            <option value="visita">🏢 Visita presencial</option>
+            <option value="whatsapp">💬 WhatsApp</option>
+            <option value="acuerdo">🤝 Acuerdo de pago</option>
+            <option value="promesa">📅 Promesa de pago</option>
+            <option value="juridico">⚖️ Proceso jurídico</option>
+          </select>
+        </div>
+        <div class="field"><label>Valor comprometido ($)</label>
+          <input type="number" id="gest-valor" placeholder="0" min="0"/>
+        </div>
+        <div class="field"><label>Fecha compromiso</label>
+          <input type="date" id="gest-fecha"/>
+        </div>
+        <div class="field"><label>Observaciones / Notas</label>
+          <textarea id="gest-obs" placeholder="Describe la gestión realizada, acuerdos, compromisos..."></textarea>
+        </div>
+        <div style="background:var(--azul-bg);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+          <p style="font-size:12px;color:var(--azul-text);font-weight:600;margin-bottom:4px">Notificaciones automáticas</p>
+          <p style="font-size:11px;color:var(--azul-text)">Se enviará notificación por correo, WhatsApp y se registrará en Google Sheets</p>
+        </div>
+        <button class="btn-primary" onclick="registrarGestion()">✅ Registrar gestión y notificar</button>
+      </div>
+    </div>
+
+    <!-- TAB HISTORIAL -->
+    <div id="ct-historial" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="hist-filtro" placeholder="Filtrar por NIT o tipo..." style="flex:1" oninput="filtrarHistorial()"/>
+        <button class="btn-outline" onclick="cargarHistorialCartera()">↻</button>
+      </div>
+      <div id="historial-lista">
+        <p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Cargando historial...</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="bottom-bar">
+    <button class="btn-secondary" onclick="ir('s-dash')">← Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ==================== MÓDULO MENSAJEROS ==================== -->
+<div id="s-mensajeros" class="screen">
+  <div class="tabs">
+    <button class="tab active" onclick="mensTab(this,'mt-despachos')">📦 Despachos</button>
+    <button class="tab" onclick="mensTab(this,'mt-asignar')">➕ Asignar</button>
+    <button class="tab" onclick="mensTab(this,'mt-novedades')">⚠️ Novedades</button>
+    <button class="tab" onclick="mensTab(this,'mt-historial')">📁 Historial</button>
+  </div>
+  <div class="body">
+
+    <!-- TAB DESPACHOS -->
+    <div id="mt-despachos">
+      <div class="cartera-resumen" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="c-metric"><div class="c-metric-label">Pendientes</div><div class="c-metric-val" id="mens-m-pend" style="color:var(--ambar)">0</div></div>
+        <div class="c-metric"><div class="c-metric-label">En camino</div><div class="c-metric-val" id="mens-m-camino" style="color:var(--azul)">0</div></div>
+        <div class="c-metric"><div class="c-metric-label">Entregados</div><div class="c-metric-val" id="mens-m-entregados" style="color:var(--verde)">0</div></div>
+      </div>
+      <div id="lista-despachos">
+        <p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Sin despachos activos</p>
+      </div>
+      <button class="btn-outline" onclick="cargarDespachos()" style="width:100%;margin-top:4px">↻ Actualizar</button>
+    </div>
+
+    <!-- TAB ASIGNAR -->
+    <div id="mt-asignar" style="display:none">
+      <div class="card">
+        <p class="card-title">Asignar pedido a mensajero</p>
+        <div class="field"><label>Número de pedido HGI</label>
+          <input type="text" id="mens-pedido-num" placeholder="Ej: PED-2025-001"/>
+        </div>
+        <div class="field"><label>Cliente / Destinatario</label>
+          <input type="text" id="mens-cliente" placeholder="Nombre o razón social"/>
+        </div>
+        <div class="field"><label>Dirección de entrega</label>
+          <input type="text" id="mens-direccion" placeholder="Dirección completa"/>
+        </div>
+        <div class="field"><label>Mensajero asignado</label>
+          <select id="mens-select">
+            <option value="">Seleccionar mensajero...</option>
+            <option value="M1">Carlos Pérez</option>
+            <option value="M2">Andrés López</option>
+            <option value="M3">Julián Torres</option>
+            <option value="M4">Diego Ramírez</option>
+          </select>
+        </div>
+        <div class="field"><label>Fecha de entrega estimada</label>
+          <input type="date" id="mens-fecha"/>
+        </div>
+        <div class="field"><label>Observaciones del despacho</label>
+          <textarea id="mens-obs" placeholder="Instrucciones especiales, horario, contacto..."></textarea>
+        </div>
+        <div style="background:var(--azul-bg);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+          <p style="font-size:12px;color:var(--azul-text);font-weight:600;margin-bottom:4px">Notificaciones automáticas</p>
+          <p style="font-size:11px;color:var(--azul-text)">Al asignar se notifica al mensajero por WhatsApp, al cliente por correo y se registra en Google Sheets</p>
+        </div>
+        <button class="btn-primary" onclick="asignarDespacho()">🚚 Asignar y notificar</button>
+      </div>
+    </div>
+
+    <!-- TAB NOVEDADES -->
+    <div id="mt-novedades" style="display:none">
+      <div class="card">
+        <p class="card-title">Reportar novedad</p>
+        <div class="field"><label>Pedido / Despacho</label>
+          <input type="text" id="nov-pedido" placeholder="Número de pedido"/>
+        </div>
+        <div class="field"><label>Tipo de novedad</label>
+          <select id="nov-tipo">
+            <option value="direccion">🏠 Dirección incorrecta</option>
+            <option value="ausente">🚫 Cliente ausente</option>
+            <option value="rechazado">❌ Pedido rechazado</option>
+            <option value="devolucion">↩️ Devolución parcial</option>
+            <option value="accidente">🚨 Accidente / Inconveniente vial</option>
+            <option value="otro">📝 Otro</option>
+          </select>
+        </div>
+        <div class="field"><label>Descripción</label>
+          <textarea id="nov-desc" placeholder="Describe la novedad con detalle..."></textarea>
+        </div>
+        <div class="field">
+          <label>GPS actual</label>
+          <div class="gps-badge" id="gps-novedad"><div class="gps-dot"></div><span id="gps-nov-text">Obteniendo ubicación...</span></div>
+        </div>
+        <button class="btn-primary" onclick="reportarNovedad()">⚠️ Reportar novedad</button>
+      </div>
+      <div class="card">
+        <p class="card-title">Novedades activas</p>
+        <div id="lista-novedades">
+          <p style="font-size:13px;color:#888;text-align:center;padding:10px">Sin novedades activas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB HISTORIAL -->
+    <div id="mt-historial" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="mens-hist-filtro" placeholder="Filtrar despachos..." style="flex:1"/>
+        <button class="btn-outline" onclick="cargarHistorialMens()">↻</button>
+      </div>
+      <div id="mens-hist-lista">
+        <p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Cargando historial...</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="bottom-bar">
+    <button class="btn-secondary" onclick="ir('s-dash')">← Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ==================== ÉXITO CARTERA ==================== -->
+<div id="s-exito-cartera" class="screen">
+  <div class="success-wrap">
+    <div class="success-circle" style="background:var(--azul-bg)">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <p style="font-size:22px;font-weight:700;color:#222;margin-bottom:8px">¡Gestión registrada!</p>
+    <p style="font-size:14px;color:#666;margin-bottom:22px" id="exito-cart-desc">Notificaciones enviadas correctamente</p>
+    <div style="background:#f8faf9;border-radius:14px;border:1px solid var(--borde);padding:16px;width:100%;max-width:320px;margin-bottom:20px">
+      <div class="sum-row"><span>Cliente</span><span style="font-weight:600" id="exito-cart-cliente">-</span></div>
+      <div class="sum-row"><span>Tipo gestión</span><span style="font-weight:600" id="exito-cart-tipo">-</span></div>
+      <div class="sum-row"><span>Valor comprometido</span><span style="font-weight:700;color:var(--azul)" id="exito-cart-valor">-</span></div>
+      <div class="sum-row" style="border:none"><span>✅ Correo</span><span class="chip chip-green">Enviado</span></div>
+      <div class="sum-row" style="border:none"><span>💬 WhatsApp</span><span class="chip chip-green">Enviado</span></div>
+      <div class="sum-row" style="border:none"><span>📊 Sheets</span><span class="chip chip-green">Registrado</span></div>
+    </div>
+    <button class="btn-primary" style="max-width:280px" onclick="ir('s-cartera')">+ Nueva gestión</button>
+    <button class="btn-secondary" style="max-width:280px" onclick="ir('s-dash')">Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ==================== ÉXITO MENSAJERO ==================== -->
+<div id="s-exito-mens" class="screen">
+  <div class="success-wrap">
+    <div class="success-circle" style="background:var(--ambar-bg)">
+      <span style="font-size:32px">🚚</span>
+    </div>
+    <p style="font-size:22px;font-weight:700;color:#222;margin-bottom:8px">¡Despacho asignado!</p>
+    <p style="font-size:14px;color:#666;margin-bottom:22px" id="exito-mens-desc">Mensajero y cliente notificados</p>
+    <div style="background:#f8faf9;border-radius:14px;border:1px solid var(--borde);padding:16px;width:100%;max-width:320px;margin-bottom:20px">
+      <div class="sum-row"><span>Pedido</span><span style="font-weight:700;color:var(--verde)" id="exito-mens-ped">-</span></div>
+      <div class="sum-row"><span>Mensajero</span><span style="font-weight:600" id="exito-mens-mensajero">-</span></div>
+      <div class="sum-row"><span>Cliente</span><span style="font-weight:600" id="exito-mens-cliente">-</span></div>
+      <div class="sum-row" style="border:none"><span>📧 Correo cliente</span><span class="chip chip-green">Enviado</span></div>
+      <div class="sum-row" style="border:none"><span>💬 WhatsApp mensajero</span><span class="chip chip-green">Enviado</span></div>
+      <div class="sum-row" style="border:none"><span>📊 Sheets</span><span class="chip chip-green">Registrado</span></div>
+    </div>
+    <button class="btn-primary" style="max-width:280px" onclick="ir('s-mensajeros')">+ Otro despacho</button>
+    <button class="btn-secondary" style="max-width:280px" onclick="ir('s-dash')">Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const BACKEND = 'https://milo-backend.onrender.com'; // CAMBIA por tu URL de Render
+const HGI_BASE = 'https://900405097.hginet.com.co/Api';
+const HGI_USER = '98711025';
+const HGI_PASS = 'C9871';
+
+// ─── ESTADO GLOBAL ────────────────────────────────────────
+let tokenHGI = null;
+let vendedoresList = [];
+let catalogoList = [];
+let pedidoActual = {cliente:{},items:[],asesor:null,transaccion:'098'};
+let gpsCoords = null;
+let gpsNovedad = null;
+let historialCartera = [];
+let despachosActivos = [];
+
+// ─── CATÁLOGO EAN (del original) ──────────────────────────
+const CATALOGO_EAN = [{"ean":"021400031821","desc":"SHELL SPIRAX S2/MD A SAE 80W90 GL-5 NAL (1 x 5GL)"},{"ean":"021400059849","desc":"SHELL ADVANCE 4T AX5 SAE 20W50 SL (CAJA 6 x 1L)"},{"ean":"021400400474","desc":"SHELL HELIX HX5 SAE 20W50 SN (CAJA 6 x 1L)"},{"ean":"021400404977","desc":"SHELL RIMULA R4 X SAE 15W40 CI-4 (CAJA 3 x 4L)"},{"ean":"021400405950","desc":"SHELL HELIX HX5 SAE 20W50 SN (CAJA 3 x 4L)"}];
+
+// ─── UTILIDADES ───────────────────────────────────────────
+function ir(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  document.getElementById(s).classList.add('active');
+  const titles = {
+    's-login':'Milo','s-dash':'Inicio','s-paso1':'Nuevo pedido',
+    's-paso2':'Agregar productos','s-paso3':'Confirmar pedido',
+    's-exito':'Pedido registrado','s-cartera':'Cartera',
+    's-mensajeros':'Mensajeros','s-exito-cartera':'Gestión registrada',
+    's-exito-mens':'Despacho asignado'
+  };
+  document.getElementById('header-sub').textContent = titles[s] || 'Milo';
+}
+
+function loading(show, msg='Procesando...'){
+  const el = document.getElementById('loading');
+  document.getElementById('loading-msg').textContent = msg;
+  el.classList.toggle('show', show);
+}
+
+function toast(msg, dur=2500){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+function fmt(n){
+  return '$' + Math.round(n||0).toLocaleString('es-CO');
+}
+
+function fechaHoy(){
+  return new Date().toISOString().split('T')[0];
+}
+
+// ─── LOGIN & TOKEN HGI ────────────────────────────────────
+async function hacerLogin(){
+  const u = document.getElementById('login-usuario').value.trim();
+  const p = document.getElementById('login-clave').value.trim();
+  if(!u||!p){toast('❌ Ingresa usuario y contraseña');return;}
+  loading(true,'Conectando con HGI ERP...');
+  try{
+    const r = await fetch(`${HGI_BASE}/token`,{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:`grant_type=password&username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}`
+    });
+    const d = await r.json();
+    if(d.access_token){
+      tokenHGI = d.access_token;
+      loading(false);
+      ir('s-dash');
+      obtenerGPS();
+      cargarVendedores();
+      document.getElementById('header-sub').textContent = 'Bienvenido · LubriAndes';
+      cargarDespachosDash();
+    } else {
+      loading(false);
+      toast('❌ Usuario o contraseña incorrectos');
+    }
+  } catch(e){
+    loading(false);
+    toast('⚠️ Error de conexión con HGI');
+    console.error(e);
+  }
+}
+
+// ─── GPS ──────────────────────────────────────────────────
+function obtenerGPS(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      gpsCoords = {lat:p.coords.latitude.toFixed(6), lng:p.coords.longitude.toFixed(6)};
+      document.getElementById('gps-text').textContent = `${gpsCoords.lat}, ${gpsCoords.lng}`;
+    },
+    ()=>{document.getElementById('gps-text').textContent='No disponible';}
+  );
+}
+
+function obtenerGPSNovedad(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      gpsNovedad = {lat:p.coords.latitude.toFixed(6),lng:p.coords.longitude.toFixed(6)};
+      document.getElementById('gps-nov-text').textContent=`${gpsNovedad.lat}, ${gpsNovedad.lng}`;
+    }
+  );
+}
+
+// ─── TABS ─────────────────────────────────────────────────
+function dashTab(btn, tabId){
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const parent = btn.closest('.screen').querySelector('.body');
+  parent.querySelectorAll(':scope > div').forEach(d=>d.style.display='none');
+  document.getElementById(tabId).style.display='block';
+  if(tabId==='dt-asesores' && !document.getElementById('lista-vendedores').children.length) cargarVendedores();
+  if(tabId==='dt-mensajeros') cargarDespachosDash();
+}
+
+function carteraTab(btn, tabId){
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const body = document.getElementById('s-cartera').querySelector('.body');
+  body.querySelectorAll(':scope > div').forEach(d=>d.style.display='none');
+  document.getElementById(tabId).style.display='block';
+  if(tabId==='ct-historial') cargarHistorialCartera();
+}
+
+function mensTab(btn, tabId){
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const body = document.getElementById('s-mensajeros').querySelector('.body');
+  body.querySelectorAll(':scope > div').forEach(d=>d.style.display='none');
+  document.getElementById(tabId).style.display='block';
+  if(tabId==='mt-novedades') obtenerGPSNovedad();
+  if(tabId==='mt-historial') cargarHistorialMens();
+  if(tabId==='mt-despachos') cargarDespachos();
+}
+
+// ─── VENDEDORES ───────────────────────────────────────────
+async function cargarVendedores(){
+  if(!tokenHGI) return;
+  try{
+    const r = await fetch(`${HGI_BASE}/Vendedores/Obtener`,{
+      headers:{'Authorization':`Bearer ${tokenHGI}`}
+    });
+    const d = await r.json();
+    vendedoresList = d.vendedores || d || [];
+    renderVendedores(vendedoresList);
+    llenarSelectAsesor();
+  } catch(e){ console.error('Error vendedores:',e); }
+}
+
+function renderVendedores(lista){
+  const el = document.getElementById('lista-vendedores');
+  if(!lista.length){el.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:10px">Sin asesores</p>';return;}
+  el.innerHTML = lista.map(v=>`
+    <div class="vend-row">
+      <div class="avatar">${(v.Nombre||v.nombre||'?').charAt(0)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${v.Nombre||v.nombre||'Asesor'}</div>
+        <div style="font-size:11px;color:#888">Cod: ${v.Codigo||v.codigo||'-'}</div>
+      </div>
+      <span class="chip chip-green">Activo</span>
+    </div>`).join('');
+}
+
+function filtrarVendedores(){
+  const q = document.getElementById('buscar-vendedor').value.toLowerCase();
+  renderVendedores(vendedoresList.filter(v=>(v.Nombre||v.nombre||'').toLowerCase().includes(q)));
+}
+
+function llenarSelectAsesor(){
+  const sel = document.getElementById('sel-asesor');
+  sel.innerHTML = '<option value="">Seleccionar asesor...</option>' +
+    vendedoresList.map(v=>`<option value="${v.Codigo||v.codigo}">${v.Nombre||v.nombre}</option>`).join('');
+}
+
+// ─── CATÁLOGO ─────────────────────────────────────────────
+async function cargarCatalogo(){
+  if(!tokenHGI) return;
+  try{
+    const r = await fetch(`${HGI_BASE}/Productos/Obtener`,{
+      headers:{'Authorization':`Bearer ${tokenHGI}`}
+    });
+    const d = await r.json();
+    catalogoList = d.productos || d || [];
+    filtrarCatalogo();
+  } catch(e){
+    document.getElementById('lista-catalogo').innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:10px">Error cargando catálogo</p>';
+  }
+}
+
+function filtrarCatalogo(){
+  const q = document.getElementById('buscar-producto-cat').value.toLowerCase();
+  const lista = catalogoList.filter(p=>(p.Descripcion||p.descripcion||'').toLowerCase().includes(q)||(p.Codigo||p.codigo||'').toLowerCase().includes(q));
+  const el = document.getElementById('lista-catalogo');
+  if(!lista.length){el.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:10px">Sin resultados</p>';return;}
+  el.innerHTML = lista.slice(0,50).map(p=>`
+    <div class="search-item" onclick="agregarProductoDesde('${p.Codigo||p.codigo}','${(p.Descripcion||p.descripcion||'').replace(/'/g,'')}',${p.Precio||p.precio||0})">
+      <div class="si-name">${p.Descripcion||p.descripcion||'-'}</div>
+      <div class="si-meta">Cod: ${p.Codigo||p.codigo||'-'} · ${fmt(p.Precio||p.precio||0)}</div>
+    </div>`).join('');
+}
+
+// ─── CLIENTES ─────────────────────────────────────────────
+async function buscarCliente(){
+  const q = document.getElementById('buscar-nit').value.trim();
+  if(!q){toast('Ingresa NIT o nombre');return;}
+  if(!tokenHGI){toast('⚠️ Sin conexión HGI');return;}
+  loading(true,'Buscando cliente...');
+  try{
+    const r = await fetch(`${HGI_BASE}/Clientes/Obtener?NIT=${encodeURIComponent(q)}`,{
+      headers:{'Authorization':`Bearer ${tokenHGI}`}
+    });
+    const d = await r.json();
+    loading(false);
+    const clientes = d.clientes || d || [];
+    const res = document.getElementById('resultados-clientes');
+    const lista = document.getElementById('lista-clientes-search');
+    if(!clientes.length){toast('Sin resultados para: '+q);return;}
+    res.style.display='block';
+    lista.innerHTML = clientes.map(c=>`
+      <div class="search-item" onclick="seleccionarCliente('${c.NIT||c.nit||''}','${(c.RazonSocial||c.razonSocial||c.Nombre||'').replace(/'/g,'')}','${(c.Direccion||c.direccion||'').replace(/'/g,'')}')">
+        <div class="si-name">${c.RazonSocial||c.razonSocial||c.Nombre||'-'}</div>
+        <div class="si-meta">NIT: ${c.NIT||c.nit||'-'}</div>
+      </div>`).join('');
+  } catch(e){loading(false);toast('Error buscando cliente');}
+}
+
+function seleccionarCliente(nit,nombre,dir){
+  document.getElementById('cli-nit').value=nit;
+  document.getElementById('cli-nombre').value=nombre;
+  document.getElementById('cli-direccion').value=dir;
+  document.getElementById('resultados-clientes').style.display='none';
+  pedidoActual.cliente={nit,nombre,dir};
+  consultarCarteraCliente(nit);
+}
+
+function mostrarFormCliente(){
+  document.getElementById('card-cliente-sel').style.display='block';
+}
+
+// ─── CARTERA EN PEDIDO ────────────────────────────────────
+async function consultarCarteraCliente(nit){
+  const card = document.getElementById('card-cartera-cliente');
+  const cont = document.getElementById('cartera-cliente-contenido');
+  card.style.display='block';
+  cont.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:14px">⏳ Consultando cartera...</p>';
+  try{
+    const data = await fetchCarteraHGI(nit);
+    renderCarteraEnPedido(cont, data);
+  } catch(e){
+    cont.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:14px">No se pudo consultar la cartera</p>';
+  }
+}
+
+async function fetchCarteraHGI(nit){
+  if(!tokenHGI) throw new Error('Sin token');
+  const r = await fetch(`${HGI_BASE}/Cartera/Obtener?NIT=${encodeURIComponent(nit)}`,{
+    headers:{'Authorization':`Bearer ${tokenHGI}`}
+  });
+  return r.json();
+}
+
+function renderCarteraEnPedido(cont, data){
+  const facturas = data.facturas || data || [];
+  if(!facturas.length){
+    cont.innerHTML='<div style="padding:12px;text-align:center"><span class="chip chip-green">✅ Sin cartera vencida</span></div>';
+    return;
+  }
+  const totalVenc = facturas.filter(f=>f.DiasVencidos>0).reduce((a,f)=>a+(f.Saldo||0),0);
+  const totalPend = facturas.reduce((a,f)=>a+(f.Saldo||0),0);
+  cont.innerHTML=`
+    <div style="padding:10px 14px">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1;text-align:center"><div style="font-size:10px;color:#888">Total cartera</div><div style="font-size:15px;font-weight:700;color:#222">${fmt(totalPend)}</div></div>
+        <div style="flex:1;text-align:center"><div style="font-size:10px;color:#888">Vencido</div><div style="font-size:15px;font-weight:700;color:var(--rojo)">${fmt(totalVenc)}</div></div>
+      </div>
+      ${facturas.slice(0,3).map(f=>{
+        const dias = f.DiasVencidos||0;
+        const cls = dias>30?'dias-venc':dias>0?'dias-warn':'dias-ok';
+        const label = dias>0?`${dias} días vencida`:'Al día';
+        return `<div class="factura-row">
+          <div class="factura-info"><div class="factura-num">Factura ${f.Numero||'-'}</div><div class="factura-meta">${f.Fecha||''}</div></div>
+          <div class="factura-monto"><div class="factura-valor">${fmt(f.Saldo)}</div><div class="factura-dias ${cls}">${label}</div></div>
+        </div>`;
+      }).join('')}
+      ${facturas.length>3?`<p style="font-size:11px;color:#888;text-align:center;padding:6px 0">+${facturas.length-3} facturas más</p>`:''}
+    </div>`;
+}
+
+// ─── PEDIDOS ──────────────────────────────────────────────
+function irPaso1(){
+  pedidoActual={cliente:{},items:[],asesor:null,transaccion:'098'};
+  document.getElementById('cli-nit').value='';
+  document.getElementById('cli-nombre').value='';
+  document.getElementById('cli-direccion').value='';
+  document.getElementById('cli-fecha').value=fechaHoy();
+  document.getElementById('card-cartera-cliente').style.display='none';
+  ir('s-paso1');
+}
+
+function irPaso2(){
+  const nit = document.getElementById('cli-nit').value.trim();
+  const nombre = document.getElementById('cli-nombre').value.trim();
+  if(!nit||!nombre){toast('❌ Completa NIT y nombre del cliente');return;}
+  pedidoActual.cliente={
+    nit, nombre,
+    dir:document.getElementById('cli-direccion').value,
+    pago:document.getElementById('cli-pago').value,
+    fecha:document.getElementById('cli-fecha').value
+  };
+  pedidoActual.asesor = document.getElementById('sel-asesor').value;
+  pedidoActual.transaccion = document.getElementById('sel-transaccion').value;
+  renderItems();
+  ir('s-paso2');
+}
+
+function irPaso3(){
+  if(!pedidoActual.items.length){toast('❌ Agrega al menos un producto');return;}
+  renderResumen();
+  ir('s-paso3');
+}
+
+// ─── SCANNER ──────────────────────────────────────────────
+function abrirScanner(){
+  const c = document.getElementById('scanner-container');
+  c.classList.add('show');
+  Quagga.init({
+    inputStream:{type:'LiveStream',target:document.getElementById('interactive'),constraints:{facingMode:'environment'}},
+    decoder:{readers:['ean_reader','code_128_reader','code_39_reader']}
+  },err=>{
+    if(err){cerrarScanner();toast('⚠️ No se pudo acceder a la cámara');return;}
+    Quagga.start();
+  });
+  Quagga.onDetected(r=>{
+    const code = r.codeResult.code;
+    cerrarScanner();
+    document.getElementById('input-ean').value=code;
+    buscarPorEAN();
+  });
+}
+
+function cerrarScanner(){
+  document.getElementById('scanner-container').classList.remove('show');
+  try{Quagga.stop();}catch(e){}
+}
+
+function buscarPorEAN(){
+  const ean = document.getElementById('input-ean').value.trim();
+  if(!ean) return;
+  const prod = CATALOGO_EAN.find(p=>p.ean===ean);
+  const res = document.getElementById('resultado-scan');
+  if(prod){
+    res.style.display='block';
+    res.style.background='var(--verde-bg)';
+    res.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--verde-text)">${prod.desc}</div>
+      <div style="font-size:11px;color:#666;margin-top:4px">EAN: ${ean}</div>
+      <button onclick="agregarProductoDesde('${ean}','${prod.desc.replace(/'/g,'')}',0)" style="margin-top:8px;padding:7px 16px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">+ Agregar</button>`;
+  } else {
+    res.style.display='block';
+    res.style.background='var(--rojo-bg)';
+    res.innerHTML=`<div style="font-size:13px;color:var(--rojo-text)">Código no encontrado en el catálogo local</div>`;
+    buscarProductoHGI(ean);
+  }
+}
+
+async function buscarProductoHGI(cod){
+  if(!tokenHGI) return;
+  try{
+    const r = await fetch(`${HGI_BASE}/Productos/Obtener?codigo=${encodeURIComponent(cod)}`,{
+      headers:{'Authorization':`Bearer ${tokenHGI}`}
+    });
+    const d = await r.json();
+    const prod = (d.productos||d||[])[0];
+    if(prod){
+      const res = document.getElementById('resultado-scan');
+      res.style.background='var(--verde-bg)';
+      res.innerHTML=`<div style="font-size:13px;font-weight:600;color:var(--verde-text)">${prod.Descripcion||prod.descripcion}</div>
+        <div style="font-size:11px;color:#666">${fmt(prod.Precio||prod.precio||0)} · Cod: ${cod}</div>
+        <button onclick="agregarProductoDesde('${cod}','${(prod.Descripcion||prod.descripcion||'').replace(/'/g,'')}',${prod.Precio||prod.precio||0})" style="margin-top:8px;padding:7px 16px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer">+ Agregar</button>`;
+    }
+  } catch(e){}
+}
+
+function agregarProductoDesde(cod, desc, precio){
+  const existe = pedidoActual.items.findIndex(i=>i.cod===cod);
+  if(existe>=0){pedidoActual.items[existe].qty++;} else {
+    pedidoActual.items.push({cod,desc,precio:parseFloat(precio)||0,qty:1});
+  }
+  renderItems();
+  document.getElementById('input-ean').value='';
+  document.getElementById('resultado-scan').style.display='none';
+  toast('✅ '+desc.substring(0,30));
+}
+
+function renderItems(){
+  const lista = document.getElementById('lista-items');
+  const badge = document.getElementById('badge-items');
+  badge.textContent = pedidoActual.items.length+' ítems';
+  if(!pedidoActual.items.length){
+    lista.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:10px">Sin productos agregados</p>';
+    return;
+  }
+  lista.innerHTML = pedidoActual.items.map((it,i)=>`
+    <div class="prod-row">
+      <div class="prod-info">
+        <div class="prod-name">${it.desc}</div>
+        <div class="prod-meta">Cod: ${it.cod} · ${fmt(it.precio)} c/u</div>
+      </div>
+      <div class="qty-wrap">
+        <button class="qty-btn" onclick="cambiarQty(${i},-1)">−</button>
+        <span class="qty-num">${it.qty}</span>
+        <button class="qty-btn" onclick="cambiarQty(${i},1)">+</button>
+      </div>
+    </div>`).join('');
+}
+
+function cambiarQty(i, d){
+  pedidoActual.items[i].qty += d;
+  if(pedidoActual.items[i].qty<=0) pedidoActual.items.splice(i,1);
+  renderItems();
+}
+
+function renderResumen(){
+  const desc = parseFloat(document.getElementById('descuento-global').value)||0;
+  const obs = document.getElementById('observaciones').value;
+  const subtotal = pedidoActual.items.reduce((a,it)=>a+it.precio*it.qty,0);
+  const descVal = subtotal*(desc/100);
+  const total = subtotal-descVal;
+  pedidoActual.subtotal=subtotal;pedidoActual.descuento=descVal;pedidoActual.total=total;pedidoActual.obs=obs;
+  document.getElementById('resumen-datos').innerHTML=`
+    <div class="sum-row"><span>Cliente</span><span style="font-weight:600">${pedidoActual.cliente.nombre}</span></div>
+    <div class="sum-row"><span>NIT</span><span>${pedidoActual.cliente.nit}</span></div>
+    <div class="sum-row"><span>Transacción</span><span>${pedidoActual.transaccion}</span></div>
+    <div class="sum-row"><span>Forma de pago</span><span>${['','Contado','30 días','60 días','90 días'][pedidoActual.cliente.pago||1]}</span></div>
+    ${obs?`<div class="sum-row"><span>Obs.</span><span style="font-size:12px">${obs}</span></div>`:''}`;
+  document.getElementById('resumen-productos').innerHTML=
+    pedidoActual.items.map(it=>`
+      <div class="sum-row">
+        <span style="font-size:12px">${it.desc.substring(0,30)}... x${it.qty}</span>
+        <span>${fmt(it.precio*it.qty)}</span>
+      </div>`).join('')+
+    (desc?`<div class="sum-row"><span>Descuento ${desc}%</span><span style="color:var(--rojo)">-${fmt(descVal)}</span></div>`:'');
+  document.getElementById('resumen-total').textContent=fmt(total);
+}
+
+async function enviarPedido(){
+  loading(true,'Enviando pedido a HGI...');
+  try{
+    const payload = {
+      Transaccion: pedidoActual.transaccion,
+      BodegaDestino: pedidoActual.transaccion==='098'?'06':pedidoActual.transaccion==='091'?'05':'00',
+      Bodega: pedidoActual.transaccion==='098'?'06':pedidoActual.transaccion==='091'?'05':'00',
+      NIT: pedidoActual.cliente.nit,
+      RazonSocial: pedidoActual.cliente.nombre,
+      Direccion: pedidoActual.cliente.dir,
+      FormaPago: pedidoActual.cliente.pago||'1',
+      FechaEntrega: pedidoActual.cliente.fecha,
+      Vendedor: pedidoActual.asesor,
+      Observaciones: pedidoActual.obs||'',
+      GPS: gpsCoords?`${gpsCoords.lat},${gpsCoords.lng}`:'',
+      Items: pedidoActual.items.map(it=>({Codigo:it.cod,Descripcion:it.desc,Cantidad:it.qty,Precio:it.precio})),
+      TotalDescuento: pedidoActual.descuento,
+      Total: pedidoActual.total
+    };
+    const r = await fetch(`${HGI_BASE}/OrdenesVenta/Crear`,{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${tokenHGI}`,'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const d = await r.json();
+    loading(false);
+    const nro = d.NumeroPedido||d.numeroPedido||d.id||('PED-'+Date.now());
+    document.getElementById('exito-nro').textContent='#'+nro;
+    document.getElementById('exito-cliente').textContent=pedidoActual.cliente.nombre;
+    document.getElementById('exito-asesor').textContent=pedidoActual.asesor||'-';
+    document.getElementById('exito-total').textContent=fmt(pedidoActual.total);
+    document.getElementById('exito-gps').textContent=gpsCoords?`${gpsCoords.lat}, ${gpsCoords.lng}`:'No disponible';
+    actualizarDashboard(pedidoActual.total);
+    ir('s-exito');
+  } catch(e){loading(false);toast('❌ Error enviando pedido: '+e.message);}
+}
+
+function nuevoPedido(){pedidoActual={cliente:{},items:[],asesor:null,transaccion:'098'};ir('s-paso1');}
+
+function actualizarDashboard(total){
+  const mp = document.getElementById('m-pedidos');
+  const mt = document.getElementById('m-total');
+  mp.textContent = (parseInt(mp.textContent)||0)+1;
+  const cur = parseInt((mt.textContent||'$0').replace(/\D/g,''))||0;
+  mt.textContent = fmt(cur+total);
+}
+
+// ─── MÓDULO CARTERA ───────────────────────────────────────
+function irCartera(){
+  ir('s-cartera');
+  // Resetear al tab de consulta
+  const firstTab = document.querySelector('#s-cartera .tab');
+  carteraTab(firstTab, 'ct-buscar');
+}
+
+function irGestionCartera(){
+  ir('s-cartera');
+  const tabs = document.querySelectorAll('#s-cartera .tab');
+  carteraTab(tabs[1], 'ct-gestion');
+}
+
+async function consultarCartera(){
+  const q = document.getElementById('cartera-nit-input').value.trim();
+  if(!q){toast('Ingresa NIT o nombre del cliente');return;}
+  if(!tokenHGI){toast('⚠️ Sin conexión HGI');return;}
+  loading(true,'Consultando cartera...');
+  const res = document.getElementById('cartera-resultado');
+  try{
+    const data = await fetchCarteraHGI(q);
+    loading(false);
+    renderCarteraCompleta(res, data, q);
+  } catch(e){
+    loading(false);
+    // Datos demo si no hay endpoint
+    renderCarteraCompleta(res, generarDemoCartera(q), q);
+  }
+}
+
+function generarDemoCartera(nit){
+  return {facturas:[
+    {Numero:'FAC-2025-0341',Fecha:'2025-03-01',Vencimiento:'2025-04-01',Saldo:3500000,DiasVencidos:19},
+    {Numero:'FAC-2025-0298',Fecha:'2025-02-15',Vencimiento:'2025-03-17',Saldo:1200000,DiasVencidos:34},
+    {Numero:'FAC-2025-0412',Fecha:'2025-04-05',Vencimiento:'2025-05-05',Saldo:2800000,DiasVencidos:0}
+  ]};
+}
+
+function renderCarteraCompleta(cont, data, nit){
+  const facturas = data.facturas||data||[];
+  if(!facturas.length){
+    cont.innerHTML=`<div class="card" style="text-align:center;padding:24px">
+      <div style="font-size:36px;margin-bottom:10px">✅</div>
+      <p style="font-weight:600;color:var(--verde-text)">Sin cartera pendiente</p>
+      <p style="font-size:13px;color:#888;margin-top:6px">NIT: ${nit}</p>
+    </div>`;
+    return;
+  }
+  const totalCartera = facturas.reduce((a,f)=>a+(f.Saldo||0),0);
+  const totalVenc = facturas.filter(f=>(f.DiasVencidos||0)>0).reduce((a,f)=>a+(f.Saldo||0),0);
+  const totalPor = facturas.filter(f=>(f.DiasVencidos||0)<=0).reduce((a,f)=>a+(f.Saldo||0),0);
+  const estadoGlobal = totalVenc>0?'vencido':totalCartera>0?'vigente':'al-dia';
+  const chips = {vencido:`<span class="chip chip-red">⚠️ Con cartera vencida</span>`,vigente:`<span class="chip chip-amber">📅 Cartera vigente</span>`,
+    'al-dia':`<span class="chip chip-green">✅ Al día</span>`};
+
+  cont.innerHTML=`
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="background:var(--verde);color:white;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:700;font-size:15px">NIT: ${nit}</div><div style="font-size:11px;opacity:.8">${facturas.length} facturas en cartera</div></div>
+        ${chips[estadoGlobal]}
+      </div>
+      <div style="padding:14px">
+        <div class="cartera-resumen">
+          <div class="c-metric"><div class="c-metric-label">Total cartera</div><div class="c-metric-val" style="color:#222">${fmt(totalCartera)}</div></div>
+          <div class="c-metric"><div class="c-metric-label">Vencido</div><div class="c-metric-val" style="color:var(--rojo)">${fmt(totalVenc)}</div></div>
+          <div class="c-metric"><div class="c-metric-label">Por vencer</div><div class="c-metric-val" style="color:var(--ambar)">${fmt(totalPor)}</div></div>
+        </div>
+        <p class="card-title">Detalle de facturas</p>
+        ${facturas.map(f=>{
+          const dias=f.DiasVencidos||0;
+          const cls=dias>60?'chip-red':dias>30?'chip-amber':dias>0?'chip-amber':'chip-green';
+          const label=dias>0?`${dias}d venc.`:'Vigente';
+          return `<div class="factura-row">
+            <div style="flex:1">
+              <div class="factura-num">Factura ${f.Numero}</div>
+              <div class="factura-meta">Vence: ${f.Vencimiento||f.Fecha||'-'}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:14px;font-weight:700">${fmt(f.Saldo)}</div>
+              <span class="chip ${cls}" style="font-size:10px">${label}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <p class="card-title">Gestión rápida</p>
+      <button class="gestion-btn" onclick="irGestionRapida('${nit}','llamada')">
+        <div class="gestion-icon" style="background:var(--azul-bg)">📞</div>
+        <span>Registrar llamada de cobro</span>
+      </button>
+      <button class="gestion-btn" onclick="irGestionRapida('${nit}','whatsapp')">
+        <div class="gestion-icon" style="background:var(--verde-bg)">💬</div>
+        <span>Enviar WhatsApp de cobro</span>
+      </button>
+      <button class="gestion-btn" onclick="irGestionRapida('${nit}','acuerdo')">
+        <div class="gestion-icon" style="background:var(--ambar-bg)">🤝</div>
+        <span>Registrar acuerdo de pago</span>
+      </button>
+    </div>`;
+}
+
+function irGestionRapida(nit, tipo){
+  const tabs = document.querySelectorAll('#s-cartera .tab');
+  carteraTab(tabs[1],'ct-gestion');
+  document.getElementById('gest-nit').value=nit;
+  document.getElementById('gest-tipo').value=tipo;
+  document.getElementById('gest-fecha').value=fechaHoy();
+}
+
+async function buscarCarteraDash(){
+  const q = document.getElementById('buscar-cartera-q').value.trim();
+  if(!q){toast('Ingresa NIT o nombre');return;}
+  const res = document.getElementById('resultado-cartera-dash');
+  res.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:14px">⏳ Consultando...</p>';
+  try{
+    const data = await fetchCarteraHGI(q);
+    renderCarteraCompleta(res, data, q);
+  } catch(e){
+    renderCarteraCompleta(res, generarDemoCartera(q), q);
+  }
+}
+
+async function registrarGestion(){
+  const nit = document.getElementById('gest-nit').value.trim();
+  const tipo = document.getElementById('gest-tipo').value;
+  const valor = document.getElementById('gest-valor').value;
+  const fecha = document.getElementById('gest-fecha').value;
+  const obs = document.getElementById('gest-obs').value.trim();
+  if(!nit){toast('❌ Ingresa el NIT del cliente');return;}
+  if(!obs){toast('❌ Agrega una descripción de la gestión');return;}
+  loading(true,'Registrando gestión y enviando notificaciones...');
+  try{
+    const payload = {
+      nit, tipo, valor:parseFloat(valor)||0, fecha, observaciones:obs,
+      registradoPor: document.getElementById('login-usuario').value,
+      timestamp: new Date().toISOString(),
+      gps: gpsCoords
+    };
+    // Enviar al backend de Render
+    const r = await fetch(`${BACKEND}/api/cartera/gestion`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    loading(false);
+    // Guardar en historial local
+    historialCartera.unshift({...payload, id:'GEST-'+Date.now()});
+    // Mostrar éxito
+    document.getElementById('exito-cart-cliente').textContent=nit;
+    document.getElementById('exito-cart-tipo').textContent=tipo;
+    document.getElementById('exito-cart-valor').textContent=fmt(parseFloat(valor)||0);
+    document.getElementById('exito-cart-desc').textContent='Notificaciones enviadas · '+new Date().toLocaleTimeString('es-CO');
+    // Limpiar form
+    document.getElementById('gest-nit').value='';
+    document.getElementById('gest-valor').value='';
+    document.getElementById('gest-obs').value='';
+    ir('s-exito-cartera');
+  } catch(e){
+    loading(false);
+    // Éxito local aunque falle backend
+    document.getElementById('exito-cart-cliente').textContent=nit;
+    document.getElementById('exito-cart-tipo').textContent=tipo;
+    document.getElementById('exito-cart-valor').textContent=fmt(parseFloat(valor)||0);
+    ir('s-exito-cartera');
+    toast('⚠️ Registrado localmente (backend no disponible)');
+  }
+}
+
+function cargarHistorialCartera(){
+  const el = document.getElementById('historial-lista');
+  if(!historialCartera.length){
+    el.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Sin gestiones registradas en esta sesión</p>';
+    return;
+  }
+  el.innerHTML = historialCartera.map(g=>`
+    <div class="card" style="padding:10px 14px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:13px;font-weight:600">NIT: ${g.nit}</span>
+        <span class="chip chip-blue">${g.tipo}</span>
+      </div>
+      <p style="font-size:12px;color:#666;margin-bottom:4px">${g.observaciones.substring(0,80)}${g.observaciones.length>80?'...':''}</p>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:11px;color:#aaa">${new Date(g.timestamp).toLocaleString('es-CO')}</span>
+        ${g.valor?`<span style="font-size:12px;font-weight:600;color:var(--azul)">${fmt(g.valor)}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function filtrarHistorial(){
+  const q = document.getElementById('hist-filtro').value.toLowerCase();
+  const filtrado = historialCartera.filter(g=>g.nit.includes(q)||g.tipo.toLowerCase().includes(q)||g.observaciones.toLowerCase().includes(q));
+  const el = document.getElementById('historial-lista');
+  if(!filtrado.length){el.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:10px">Sin resultados</p>';return;}
+  el.innerHTML = filtrado.map(g=>`
+    <div class="card" style="padding:10px 14px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:13px;font-weight:600">NIT: ${g.nit}</span>
+        <span class="chip chip-blue">${g.tipo}</span>
+      </div>
+      <p style="font-size:12px;color:#666">${g.observaciones.substring(0,80)}</p>
+      <span style="font-size:11px;color:#aaa">${new Date(g.timestamp).toLocaleString('es-CO')}</span>
+    </div>`).join('');
+}
+
+// ─── MÓDULO MENSAJEROS ────────────────────────────────────
+function irMensajeros(){
+  ir('s-mensajeros');
+  cargarDespachos();
+  obtenerGPSNovedad();
+  // Resetear al tab despachos
+  const firstTab = document.querySelector('#s-mensajeros .tab');
+  mensTab(firstTab, 'mt-despachos');
+}
+
+function generarDemoDespachos(){
+  return [
+    {id:'DES-001',pedido:'PED-2025-088',cliente:'Lubricentro El Rápido',direccion:'Cr 45 #67-23, Medellín',mensajero:'Carlos Pérez',mensajeroId:'M1',estado:'en_camino',fecha:fechaHoy()},
+    {id:'DES-002',pedido:'PED-2025-089',cliente:'Filtros del Norte',direccion:'Av Laureles #12-45, Medellín',mensajero:'Andrés López',mensajeroId:'M2',estado:'pendiente',fecha:fechaHoy()},
+    {id:'DES-003',pedido:'PED-2025-085',cliente:'Taller El Mecánico',direccion:'Cl 33 #80-15, Envigado',mensajero:'Julián Torres',mensajeroId:'M3',estado:'entregado',fecha:fechaHoy()},
+  ];
+}
+
+async function cargarDespachos(){
+  const el = document.getElementById('lista-despachos');
+  try{
+    const r = await fetch(`${BACKEND}/api/mensajeros/despachos`);
+    despachosActivos = await r.json();
+  } catch(e){
+    despachosActivos = generarDemoDespachos();
+  }
+  renderDespachos();
+}
+
+async function cargarDespachosDash(){
+  try{
+    const r = await fetch(`${BACKEND}/api/mensajeros/despachos`);
+    despachosActivos = await r.json();
+  } catch(e){
+    despachosActivos = generarDemoDespachos();
+  }
+  const el = document.getElementById('resumen-despachos-dash');
+  const pend = despachosActivos.filter(d=>d.estado==='pendiente').length;
+  const cam = despachosActivos.filter(d=>d.estado==='en_camino').length;
+  const ent = despachosActivos.filter(d=>d.estado==='entregado').length;
+  el.innerHTML=`
+    <div class="cartera-resumen" style="margin-bottom:10px">
+      <div class="c-metric"><div class="c-metric-label">Pendientes</div><div class="c-metric-val" style="color:var(--ambar)">${pend}</div></div>
+      <div class="c-metric"><div class="c-metric-label">En camino</div><div class="c-metric-val" style="color:var(--azul)">${cam}</div></div>
+      <div class="c-metric"><div class="c-metric-label">Entregados</div><div class="c-metric-val" style="color:var(--verde)">${ent}</div></div>
+    </div>
+    ${despachosActivos.slice(0,2).map(d=>renderDespachoCard(d)).join('')}`;
+}
+
+function renderDespachos(){
+  const el = document.getElementById('lista-despachos');
+  const pend=despachosActivos.filter(d=>d.estado==='pendiente').length;
+  const cam=despachosActivos.filter(d=>d.estado==='en_camino').length;
+  const ent=despachosActivos.filter(d=>d.estado==='entregado').length;
+  document.getElementById('mens-m-pend').textContent=pend;
+  document.getElementById('mens-m-camino').textContent=cam;
+  document.getElementById('mens-m-entregados').textContent=ent;
+  if(!despachosActivos.length){el.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Sin despachos activos</p>';return;}
+  el.innerHTML = despachosActivos.map(d=>renderDespachoCard(d)).join('');
+}
+
+function renderDespachoCard(d){
+  const estadoChip = {
+    pendiente:`<span class="chip chip-amber">⏳ Pendiente</span>`,
+    en_camino:`<span class="chip chip-blue">🚚 En camino</span>`,
+    entregado:`<span class="chip chip-green">✅ Entregado</span>`,
+    novedad:`<span class="chip chip-red">⚠️ Novedad</span>`
+  }[d.estado]||`<span class="chip chip-gray">${d.estado}</span>`;
+  const steps=['pendiente','en_camino','entregado'];
+  const curStep=steps.indexOf(d.estado);
+  const stepsHtml=steps.map((s,i)=>`<div class="et-step ${i<curStep?'done':i===curStep?'active':''}"></div>`).join('');
+  const labelsHtml=['Asignado','En camino','Entregado'].map((l,i)=>`<span class="et-label ${i<curStep?'done':i===curStep?'active':''}">${l}</span>`).join('');
+
+  return `<div class="despacho-card">
+    <div class="despacho-header">
+      <span class="despacho-num">${d.pedido}</span>
+      ${estadoChip}
+    </div>
+    <div class="despacho-cliente">👤 ${d.cliente}</div>
+    <div style="font-size:11px;color:#888;margin-bottom:6px">📍 ${d.direccion}</div>
+    <div class="despacho-detalle">
+      <span class="badge badge-blue">${d.mensajero}</span>
+    </div>
+    <div class="estado-timeline">${stepsHtml}</div>
+    <div class="et-labels">${labelsHtml}</div>
+    ${d.estado!=='entregado'?`
+    <div style="display:flex;gap:6px;margin-top:10px">
+      ${d.estado==='pendiente'?`<button onclick="cambiarEstado('${d.id}','en_camino')" style="flex:1;padding:7px;background:var(--azul);color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer">🚚 Salió a entregar</button>`:''}
+      ${d.estado==='en_camino'?`<button onclick="cambiarEstado('${d.id}','entregado')" style="flex:1;padding:7px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer">✅ Confirmar entrega</button>`:''}
+      <button onclick="reportarNovedadDespacho('${d.id}','${d.pedido}')" style="padding:7px 10px;background:var(--rojo-bg);color:var(--rojo-text);border:none;border-radius:8px;font-size:12px;cursor:pointer">⚠️</button>
+    </div>`:''}
+  </div>`;
+}
+
+async function cambiarEstado(id, nuevoEstado){
+  const idx = despachosActivos.findIndex(d=>d.id===id);
+  if(idx<0) return;
+  loading(true,'Actualizando estado...');
+  try{
+    await fetch(`${BACKEND}/api/mensajeros/estado`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id,estado:nuevoEstado,timestamp:new Date().toISOString(),gps:gpsCoords})
+    });
+  } catch(e){}
+  despachosActivos[idx].estado=nuevoEstado;
+  loading(false);
+  renderDespachos();
+  toast(nuevoEstado==='entregado'?'✅ Entrega confirmada':'🚚 Estado actualizado');
+}
+
+async function asignarDespacho(){
+  const pedido = document.getElementById('mens-pedido-num').value.trim();
+  const cliente = document.getElementById('mens-cliente').value.trim();
+  const dir = document.getElementById('mens-direccion').value.trim();
+  const mensId = document.getElementById('mens-select').value;
+  const fecha = document.getElementById('mens-fecha').value;
+  const obs = document.getElementById('mens-obs').value;
+  if(!pedido||!cliente||!mensId){toast('❌ Completa pedido, cliente y mensajero');return;}
+  const mensNombre = document.getElementById('mens-select').selectedOptions[0].text;
+  loading(true,'Asignando despacho y notificando...');
+  const despacho = {
+    id:'DES-'+Date.now(), pedido, cliente, direccion:dir,
+    mensajero:mensNombre, mensajeroId:mensId,
+    fecha, observaciones:obs, estado:'pendiente',
+    timestamp:new Date().toISOString()
+  };
+  try{
+    await fetch(`${BACKEND}/api/mensajeros/asignar`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(despacho)
+    });
+  } catch(e){}
+  loading(false);
+  despachosActivos.unshift(despacho);
+  document.getElementById('exito-mens-ped').textContent=pedido;
+  document.getElementById('exito-mens-mensajero').textContent=mensNombre;
+  document.getElementById('exito-mens-cliente').textContent=cliente;
+  document.getElementById('exito-mens-desc').textContent='Notificado el '+new Date().toLocaleString('es-CO');
+  // Limpiar form
+  ['mens-pedido-num','mens-cliente','mens-direccion','mens-obs'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mens-select').value='';
+  ir('s-exito-mens');
+}
+
+function reportarNovedadDespacho(id, pedidoNum){
+  const tabs = document.querySelectorAll('#s-mensajeros .tab');
+  mensTab(tabs[2],'mt-novedades');
+  document.getElementById('nov-pedido').value=pedidoNum;
+}
+
+async function reportarNovedad(){
+  const pedido = document.getElementById('nov-pedido').value.trim();
+  const tipo = document.getElementById('nov-tipo').value;
+  const desc = document.getElementById('nov-desc').value.trim();
+  if(!pedido||!desc){toast('❌ Completa pedido y descripción');return;}
+  loading(true,'Reportando novedad...');
+  const novedad = {
+    pedido, tipo, descripcion:desc,
+    gps:gpsNovedad, timestamp:new Date().toISOString(),
+    reportadoPor:document.getElementById('login-usuario').value
+  };
+  try{
+    await fetch(`${BACKEND}/api/mensajeros/novedad`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(novedad)
+    });
+  } catch(e){}
+  loading(false);
+  // Actualizar despacho a estado novedad
+  const idx = despachosActivos.findIndex(d=>d.pedido===pedido);
+  if(idx>=0) despachosActivos[idx].estado='novedad';
+  // Renderizar en lista
+  const lista = document.getElementById('lista-novedades');
+  lista.innerHTML=`<div class="novedad-item urgente">
+    <div style="font-weight:600;margin-bottom:3px">⚠️ ${pedido} · ${tipo}</div>
+    <div>${desc}</div>
+    <div style="font-size:10px;color:#888;margin-top:4px">${new Date().toLocaleTimeString('es-CO')}</div>
+  </div>`+(lista.innerHTML.includes('Sin novedades')?'':lista.innerHTML);
+  document.getElementById('nov-pedido').value='';
+  document.getElementById('nov-desc').value='';
+  toast('✅ Novedad reportada y notificada');
+}
+
+async function cargarHistorialMens(){
+  const el = document.getElementById('mens-hist-lista');
+  const todos = despachosActivos;
+  if(!todos.length){
+    el.innerHTML='<p style="font-size:13px;color:#888;text-align:center;padding:20px;background:white;border-radius:14px;border:1px solid var(--borde)">Sin despachos en historial</p>';
+    return;
+  }
+  el.innerHTML = todos.map(d=>renderDespachoCard(d)).join('');
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+document.getElementById('cli-fecha').value = fechaHoy();
+document.getElementById('mens-fecha').value = fechaHoy();
+</script>
+</body>
+</html>
