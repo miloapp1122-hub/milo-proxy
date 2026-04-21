@@ -403,32 +403,26 @@ def get_cartera():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        # Usar el mismo proxy generico que ya funciona
         now = datetime.now()
         anyo_actual = now.year
         mes_actual = now.month
         todos = []
         vistos = set()
-        # Llamar directamente sin pasar por params para evitar codificacion
-        import urllib.request
-        import ssl
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
+        # Construir URL sin params para evitar codificacion
         hgi_url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo_actual}&periodo={mes_actual}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
-        req = urllib.request.Request(hgi_url, headers={'Authorization': f'Bearer {tok}'})
-        try:
-            with urllib.request.urlopen(req, context=ctx, timeout=20) as resp:
-                import json
-                data = json.loads(resp.read().decode())
+        print(f'[Cartera] URL: {hgi_url}')
+        r2 = requests.get(hgi_url, headers=headers, timeout=20, verify=False)
+        print(f'[Cartera] Status2: {r2.status_code} Bytes2: {len(r2.text)}')
+        if r2.status_code == 200 and r2.text:
+            try:
+                data = r2.json()
                 if isinstance(data, list):
                     for x in data:
                         doc = x.get('Documento')
                         if doc not in vistos and x.get('SaldoFinal', 0) > 0:
                             vistos.add(doc)
                             todos.append(x)
-        except Exception as e2:
-            print(f'[Cartera] urllib error: {e2}')
+            except: pass
         class FakeResponse:
             status_code = 200
             text = 'ok'
