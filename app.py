@@ -338,7 +338,11 @@ def get_vendedores():
         r = requests.get(
             f'{HGI_BASE}/Vendedores/Obtener?codigo_vendedor=*',
             headers=headers, timeout=20, verify=False)
-        return jsonify(r.json()), r.status_code
+        print(f'[Vendedores] Status: {r.status_code}')
+        print(f'[Vendedores] Respuesta: {r.text[:300]}')
+        if r.text:
+            return jsonify(r.json()), r.status_code
+        return jsonify({'error': 'Respuesta vacía', 'status': r.status_code}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
