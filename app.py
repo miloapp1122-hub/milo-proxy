@@ -423,3 +423,25 @@ if __name__ == '__main__':
     t.start()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
+@app.route('/api/productos', methods=['GET'])
+def get_productos():
+    global _token
+    q = request.args.get('q', '*')
+    with _token_lock:
+        tok = _token
+    if not tok or not token_valido(tok):
+        return jsonify({'error': 'Sin token'}), 401
+    try:
+        headers = {'Authorization': f'Bearer {tok}'}
+        r = requests.get(
+            f'{HGI_BASE}/Productos/ObtenerProductos',
+            params={'codigo_producto': q, 'movil': '1', 'ecommerce': '*',
+                    'estado': '1', 'kardex': '*', 'incluir_foto': 'false'},
+            headers=headers, timeout=30, verify=False)
+        print(f'[Productos] Status: {r.status_code}')
+        if r.text:
+            return jsonify(r.json()), r.status_code
+        return jsonify({'error': 'Sin respuesta', 'status': r.status_code}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
