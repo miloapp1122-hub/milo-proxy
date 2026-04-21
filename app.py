@@ -34,8 +34,10 @@ except:
     _wa_keys = {}
     _wa_nums = {}
 
-_token = None
+_token = os.environ.get('HGI_TOKEN_INICIAL', None)
 _token_lock = threading.Lock()
+if _token:
+    print(f'[MILO] Token inicial cargado desde env var')
 
 def jwt_exp(token):
     """Obtiene el tiempo de expiración del JWT"""
