@@ -403,18 +403,30 @@ def get_cartera():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        # Traer solo año actual y anterior para cartera pendiente
-        anyo_actual = datetime.now().year
+        # Traer cartera por mes actual y meses anteriores
+        now = datetime.now()
+        anyo_actual = now.year
+        mes_actual = now.month
         todos = []
-        for anyo in [anyo_actual - 3, anyo_actual - 2, anyo_actual - 1, anyo_actual]:
-            url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo}&periodo=*&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
-            r2 = requests.get(url, headers=headers, timeout=15, verify=False)
+        vistos = set()
+        # Iterar últimos 18 meses
+        for i in range(18):
+            mes = mes_actual - i
+            anyo = anyo_actual
+            while mes <= 0:
+                mes += 12
+                anyo -= 1
+            url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo}&periodo={mes}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
+            r2 = requests.get(url, headers=headers, timeout=10, verify=False)
             if r2.status_code == 200 and r2.text:
                 try:
                     data = r2.json()
                     if isinstance(data, list):
-                        # Solo saldos positivos (lo que debe)
-                        todos.extend([x for x in data if x.get('SaldoFinal', 0) > 0])
+                        for x in data:
+                            doc = x.get('Documento')
+                            if doc not in vistos and x.get('SaldoFinal', 0) > 0:
+                                vistos.add(doc)
+                                todos.append(x)
                 except: pass
         class FakeResponse:
             status_code = 200
