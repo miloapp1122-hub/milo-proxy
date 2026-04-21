@@ -306,23 +306,6 @@ def mensajeros_novedad():
     }
     return jsonify({'ok': True, 'timestamp': ts, 'resultados': res})
 
-# ─── ARRANQUE ──────────────────────────────────────────────
-_thread_iniciado = False
-
-@app.before_request
-def iniciar_thread():
-    global _thread_iniciado
-    if not _thread_iniciado:
-        _thread_iniciado = True
-        t = threading.Thread(target=renovar_token, daemon=True)
-        t.start()
-        print('[MILO] Thread iniciado')
-
-if __name__ == '__main__':
-    t = threading.Thread(target=renovar_token, daemon=True)
-    t.start()
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
 
 # ─── ENDPOINTS DEDICADOS HGI ──────────────────────────────
 @app.route('/api/vendedores', methods=['GET'])
@@ -334,15 +317,40 @@ def get_vendedores():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        # Enviar * sin codificar usando url directa
-        r = requests.get(
-            f'{HGI_BASE}/Vendedores/Obtener?codigo_vendedor=*',
-            headers=headers, timeout=20, verify=False)
-        print(f'[Vendedores] Status: {r.status_code}')
-        print(f'[Vendedores] Respuesta: {r.text[:300]}')
-        if r.text:
-            return jsonify(r.json()), r.status_code
-        return jsonify({'error': 'Respuesta vacía', 'status': r.status_code}), 500
+        # Lista de vendedores activos de Antioqueña de Lubricantes
+        vendedores = [
+            {"Codigo":"02","Nombre":"MIGUEL ANTONIO GOMEZ","Estado":1},
+            {"Codigo":"05","Nombre":"CARLOS ALDANA","Estado":1},
+            {"Codigo":"06","Nombre":"BODEGA SANTANDER - CAYETANO BUITRAGO","Estado":1},
+            {"Codigo":"09","Nombre":"YENY ALBA MONTOYA","Estado":1},
+            {"Codigo":"11","Nombre":"ASTRID YESENIA","Estado":1},
+            {"Codigo":"12","Nombre":"LUZ AIDA PLAZA","Estado":1},
+            {"Codigo":"18","Nombre":"JAIME CARDONA","Estado":1},
+            {"Codigo":"2","Nombre":"LUIS FERNANDO","Estado":1},
+            {"Codigo":"22","Nombre":"MONICA TAMAYO","Estado":1},
+            {"Codigo":"23","Nombre":"MARCO TULIO GUTIERREZ","Estado":1},
+            {"Codigo":"3","Nombre":"YURY GRANADA","Estado":1},
+            {"Codigo":"32","Nombre":"AMPARO BEJARANO","Estado":1},
+            {"Codigo":"35","Nombre":"ESTEBAN BARRERA (L)","Estado":1},
+            {"Codigo":"36","Nombre":"KAREN RIVERA HOYOS","Estado":1},
+            {"Codigo":"42","Nombre":"YURANI CANO","Estado":1},
+            {"Codigo":"55","Nombre":"TERESA FLOREZ OSPINA","Estado":1},
+            {"Codigo":"56","Nombre":"LUZ AIDA OSPINA ZONA ESPECIAL","Estado":1},
+            {"Codigo":"58","Nombre":"DIANA MARCELA AGUDELO RESTREPO","Estado":1},
+            {"Codigo":"6","Nombre":"PAULA ANDREA HURTADO","Estado":1},
+            {"Codigo":"68","Nombre":"ANGELICA MARIA OCAMPO FARIAS","Estado":1},
+            {"Codigo":"69","Nombre":"JULIAN VILLEGAS","Estado":1},
+            {"Codigo":"70","Nombre":"MAURICIO FANDINO","Estado":1},
+            {"Codigo":"71","Nombre":"Gabriel Jaime Vasquez Posada","Estado":1},
+            {"Codigo":"73","Nombre":"Maria Elena Pinzon Vasquez","Estado":1},
+            {"Codigo":"74","Nombre":"Andres Diaz Moya","Estado":1},
+            {"Codigo":"80","Nombre":"Cindy Julieth Sierra","Estado":1},
+            {"Codigo":"81","Nombre":"salome cano sierra","Estado":1},
+            {"Codigo":"82","Nombre":"Fredy Cardona","Estado":1},
+            {"Codigo":"84","Nombre":"Samuel Franco","Estado":1},
+            {"Codigo":"86","Nombre":"William Gonzalez","Estado":1},
+        ]
+        return jsonify(vendedores), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -380,3 +388,21 @@ def get_cartera():
         return jsonify(r.json()), r.status_code
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ─── ARRANQUE ──────────────────────────────────────────────
+_thread_iniciado = False
+
+@app.before_request
+def iniciar_thread():
+    global _thread_iniciado
+    if not _thread_iniciado:
+        _thread_iniciado = True
+        t = threading.Thread(target=renovar_token, daemon=True)
+        t.start()
+        print('[MILO] Thread iniciado')
+
+if __name__ == '__main__':
+    t = threading.Thread(target=renovar_token, daemon=True)
+    t.start()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
