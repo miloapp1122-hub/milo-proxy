@@ -323,3 +323,55 @@ if __name__ == '__main__':
     t.start()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
+# ─── ENDPOINTS DEDICADOS HGI ──────────────────────────────
+@app.route('/api/vendedores', methods=['GET'])
+def get_vendedores():
+    global _token
+    with _token_lock:
+        tok = _token
+    if not tok or not token_valido(tok):
+        return jsonify({'error': 'Sin token'}), 401
+    try:
+        headers = {'Authorization': f'Bearer {tok}'}
+        r = requests.get(f'{HGI_BASE}/Vendedores/Obtener',
+            params={'codigo_vendedor': '*'},
+            headers=headers, timeout=20, verify=False)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/clientes', methods=['GET'])
+def get_clientes():
+    global _token
+    q = request.args.get('q', '')
+    with _token_lock:
+        tok = _token
+    if not tok or not token_valido(tok):
+        return jsonify({'error': 'Sin token'}), 401
+    try:
+        headers = {'Authorization': f'Bearer {tok}'}
+        r = requests.get(f'{HGI_BASE}/Terceros/Busqueda',
+            params={'filtro_busqueda': q},
+            headers=headers, timeout=20, verify=False)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/cartera', methods=['GET'])
+def get_cartera():
+    global _token
+    nit = request.args.get('nit', '*')
+    with _token_lock:
+        tok = _token
+    if not tok or not token_valido(tok):
+        return jsonify({'error': 'Sin token'}), 401
+    try:
+        headers = {'Authorization': f'Bearer {tok}'}
+        r = requests.get(f'{HGI_BASE}/Cartera/Obtener',
+            params={'anyo': '*', 'periodo': '*', 'codigo_tercero': nit,
+                    'codigo_local': '0', 'tipo_cartera': '0', 'grupo': '0', 'codigo_clase': '0'},
+            headers=headers, timeout=20, verify=False)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
