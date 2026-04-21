@@ -403,24 +403,32 @@ def get_cartera():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        # Traer cartera del mes actual solamente - rápido y preciso
+        # Usar el mismo proxy generico que ya funciona
         now = datetime.now()
         anyo_actual = now.year
         mes_actual = now.month
         todos = []
         vistos = set()
-        url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo_actual}&periodo={mes_actual}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
-        r2 = requests.get(url, headers=headers, timeout=20, verify=False)
-        if r2.status_code == 200 and r2.text:
-            try:
-                data = r2.json()
+        # Llamar directamente sin pasar por params para evitar codificacion
+        import urllib.request
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        hgi_url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo_actual}&periodo={mes_actual}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
+        req = urllib.request.Request(hgi_url, headers={'Authorization': f'Bearer {tok}'})
+        try:
+            with urllib.request.urlopen(req, context=ctx, timeout=20) as resp:
+                import json
+                data = json.loads(resp.read().decode())
                 if isinstance(data, list):
                     for x in data:
                         doc = x.get('Documento')
                         if doc not in vistos and x.get('SaldoFinal', 0) > 0:
                             vistos.add(doc)
                             todos.append(x)
-            except: pass
+        except Exception as e2:
+            print(f'[Cartera] urllib error: {e2}')
         class FakeResponse:
             status_code = 200
             text = 'ok'
