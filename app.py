@@ -202,6 +202,7 @@ def ping():
 
 @app.route('/hgi/token', methods=['POST', 'OPTIONS'])
 def hgi_token():
+    global _token
     if request.method == 'OPTIONS':
         return jsonify({}), 200
     with _token_lock:
@@ -215,6 +216,7 @@ def hgi_token():
 
 @app.route('/hgi/<path:endpoint>', methods=['GET', 'POST', 'OPTIONS'])
 def hgi_proxy(endpoint):
+    global _token
     if request.method == 'OPTIONS':
         return jsonify({}), 200
     with _token_lock:
