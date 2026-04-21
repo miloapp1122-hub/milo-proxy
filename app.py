@@ -384,8 +384,13 @@ def get_clientes():
         r = requests.get(f'{HGI_BASE}/Terceros/Busqueda',
             params={'filtro_busqueda': q},
             headers=headers, timeout=20, verify=False)
-        return jsonify(r.json()), r.status_code
+        print(f'[Clientes] Status: {r.status_code}')
+        print(f'[Clientes] Respuesta: {r.text[:200]}')
+        if r.text:
+            return jsonify(r.json()), r.status_code
+        return jsonify([]), 200
     except Exception as e:
+        print(f'[Clientes] ERROR: {e}')
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/cartera', methods=['GET'])
@@ -398,12 +403,15 @@ def get_cartera():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        r = requests.get(f'{HGI_BASE}/Cartera/Obtener',
-            params={'anyo': '*', 'periodo': '*', 'codigo_tercero': nit,
-                    'codigo_local': '0', 'tipo_cartera': '0', 'grupo': '0', 'codigo_clase': '0'},
-            headers=headers, timeout=20, verify=False)
-        return jsonify(r.json()), r.status_code
+        url = f'{HGI_BASE}/Cartera/Obtener?anyo=*&periodo=*&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
+        r = requests.get(url, headers=headers, timeout=30, verify=False)
+        print(f'[Cartera] Status: {r.status_code}')
+        print(f'[Cartera] Bytes: {len(r.text)}')
+        if r.text:
+            return jsonify(r.json()), r.status_code
+        return jsonify([]), 200
     except Exception as e:
+        print(f'[Cartera] ERROR: {e}')
         return jsonify({'error': str(e)}), 500
 
 # ─── ARRANQUE ──────────────────────────────────────────────
