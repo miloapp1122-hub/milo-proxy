@@ -334,8 +334,9 @@ def get_vendedores():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        r = requests.get(f'{HGI_BASE}/Vendedores/Obtener',
-            params={'codigo_vendedor': '*'},
+        # Enviar * sin codificar usando url directa
+        r = requests.get(
+            f'{HGI_BASE}/Vendedores/Obtener?codigo_vendedor=*',
             headers=headers, timeout=20, verify=False)
         return jsonify(r.json()), r.status_code
     except Exception as e:
