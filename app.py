@@ -230,7 +230,10 @@ def hgi_proxy(endpoint):
         if request.method == 'POST':
             r = requests.post(url, json=request.get_json(), headers=headers, params=params, timeout=30, verify=False)
         else:
-            r = requests.get(url, headers=headers, params=params, timeout=30, verify=False)
+            # Construir query string sin codificar asteriscos
+            qs = '&'.join(f'{k}={v}' for k,v in params.items())
+            full_url = f'{url}?{qs}' if qs else url
+            r = requests.get(full_url, headers=headers, timeout=30, verify=False)
         if r.status_code == 401:
             with _token_lock:
                 _token = None
