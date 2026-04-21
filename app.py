@@ -47,21 +47,28 @@ _token_lock = threading.Lock()
 
 def renovar_token():
     global _token
-    url = f"{HGI_BASE}/Autenticar?usuario={HGI_USUARIO}&clave={HGI_CLAVE}&cod_compania={HGI_COMPANIA}&cod_empresa={HGI_EMPRESA}"
+    url_auth   = f"{HGI_BASE}/Autenticar?usuario={HGI_USUARIO}&clave={HGI_CLAVE}&cod_compania={HGI_COMPANIA}&cod_empresa={HGI_EMPRESA}"
     while True:
         try:
-            r = requests.get(url, timeout=15, verify=False)
+            r = requests.get(url_auth, timeout=15, verify=False)
             data = r.json()
             jwt = data.get('JwtToken')
+            error = data.get('Error') or {}
+            codigo_error = error.get('Codigo', 0)
+
             if jwt:
                 with _token_lock:
                     _token = jwt
                 print(f'[MILO] ✅ Token renovado!')
-                time.sleep(18 * 60)  # Renovar cada 18 minutos
-            else:
-                msg = data.get('Error', {}).get('Mensaje', '?')
-                print(f'[MILO] Token vigente ({msg}) - esperando 60s...')
+                time.sleep(18 * 60)
+
+            elif codigo_error == 3:
+                # Token vigente — esperar a que expire (cada 60s)
+                print(f'[MILO] Token vigente - esperando 60s a que expire...')
                 time.sleep(60)
+            else:
+                print(f'[MILO] Error desconocido - esperando 30s...')
+                time.sleep(30)
         except Exception as e:
             print(f'[MILO] Error auth: {e}')
             time.sleep(30)
