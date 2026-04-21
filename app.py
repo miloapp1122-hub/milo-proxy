@@ -403,8 +403,24 @@ def get_cartera():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        url = f'{HGI_BASE}/Cartera/Obtener?anyo=*&periodo=*&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
-        r = requests.get(url, headers=headers, timeout=30, verify=False)
+        # Traer solo año actual y anterior para cartera pendiente
+        anyo_actual = datetime.now().year
+        todos = []
+        for anyo in [anyo_actual - 1, anyo_actual]:
+            url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo}&periodo=*&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
+            r2 = requests.get(url, headers=headers, timeout=15, verify=False)
+            if r2.status_code == 200 and r2.text:
+                try:
+                    data = r2.json()
+                    if isinstance(data, list):
+                        # Solo saldos positivos (lo que debe)
+                        todos.extend([x for x in data if x.get('SaldoFinal', 0) > 0])
+                except: pass
+        class FakeResponse:
+            status_code = 200
+            text = 'ok'
+            def json(self): return todos
+        r = FakeResponse()
         print(f'[Cartera] Status: {r.status_code}')
         print(f'[Cartera] Bytes: {len(r.text)}')
         if r.text:
