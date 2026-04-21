@@ -403,31 +403,24 @@ def get_cartera():
         return jsonify({'error': 'Sin token'}), 401
     try:
         headers = {'Authorization': f'Bearer {tok}'}
-        # Traer cartera por mes actual y meses anteriores
+        # Traer cartera del mes actual solamente - rápido y preciso
         now = datetime.now()
         anyo_actual = now.year
         mes_actual = now.month
         todos = []
         vistos = set()
-        # Iterar últimos 18 meses
-        for i in range(18):
-            mes = mes_actual - i
-            anyo = anyo_actual
-            while mes <= 0:
-                mes += 12
-                anyo -= 1
-            url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo}&periodo={mes}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
-            r2 = requests.get(url, headers=headers, timeout=10, verify=False)
-            if r2.status_code == 200 and r2.text:
-                try:
-                    data = r2.json()
-                    if isinstance(data, list):
-                        for x in data:
-                            doc = x.get('Documento')
-                            if doc not in vistos and x.get('SaldoFinal', 0) > 0:
-                                vistos.add(doc)
-                                todos.append(x)
-                except: pass
+        url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo_actual}&periodo={mes_actual}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
+        r2 = requests.get(url, headers=headers, timeout=20, verify=False)
+        if r2.status_code == 200 and r2.text:
+            try:
+                data = r2.json()
+                if isinstance(data, list):
+                    for x in data:
+                        doc = x.get('Documento')
+                        if doc not in vistos and x.get('SaldoFinal', 0) > 0:
+                            vistos.add(doc)
+                            todos.append(x)
+            except: pass
         class FakeResponse:
             status_code = 200
             text = 'ok'
