@@ -406,7 +406,7 @@ def get_cartera():
         # Traer solo año actual y anterior para cartera pendiente
         anyo_actual = datetime.now().year
         todos = []
-        for anyo in [anyo_actual - 1, anyo_actual]:
+        for anyo in [anyo_actual - 3, anyo_actual - 2, anyo_actual - 1, anyo_actual]:
             url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo}&periodo=*&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
             r2 = requests.get(url, headers=headers, timeout=15, verify=False)
             if r2.status_code == 200 and r2.text:
