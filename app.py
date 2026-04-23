@@ -408,31 +408,29 @@ def get_cartera():
         mes_actual = now.month
         todos = []
         vistos = set()
-        # Construir URL sin params para evitar codificacion
-        hgi_url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo_actual}&periodo={mes_actual}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
-        print(f'[Cartera] URL: {hgi_url}')
-        r2 = requests.get(hgi_url, headers=headers, timeout=20, verify=False)
-        print(f'[Cartera] Status2: {r2.status_code} Bytes2: {len(r2.text)}')
-        if r2.status_code == 200 and r2.text:
-            try:
-                data = r2.json()
-                if isinstance(data, list):
-                    for x in data:
-                        doc = x.get('Documento')
-                        if doc not in vistos and x.get('SaldoFinal', 0) > 0:
-                            vistos.add(doc)
-                            todos.append(x)
-            except: pass
-        class FakeResponse:
-            status_code = 200
-            text = 'ok'
-            def json(self): return todos
-        r = FakeResponse()
-        print(f'[Cartera] Status: {r.status_code}')
-        print(f'[Cartera] Bytes: {len(r.text)}')
-        if r.text:
-            return jsonify(r.json()), r.status_code
-        return jsonify([]), 200
+        # Iterar mes actual y 3 meses anteriores para cartera pendiente
+        for i in range(4):
+            mes = mes_actual - i
+            anyo = anyo_actual
+            if mes <= 0:
+                mes += 12
+                anyo -= 1
+            hgi_url = f'{HGI_BASE}/Cartera/Obtener?anyo={anyo}&periodo={mes}&codigo_tercero={nit}&codigo_local=0&tipo_cartera=0&grupo=0&codigo_clase=0'
+            print(f'[Cartera] Consultando {anyo}/{mes}...')
+            r2 = requests.get(hgi_url, headers=headers, timeout=15, verify=False)
+            print(f'[Cartera] Status: {r2.status_code} Bytes: {len(r2.text)}')
+            if r2.status_code == 200 and r2.text and len(r2.text) > 2:
+                try:
+                    data = r2.json()
+                    if isinstance(data, list):
+                        for x in data:
+                            doc = x.get('Documento')
+                            if doc not in vistos and x.get('SaldoFinal', 0) > 0:
+                                vistos.add(doc)
+                                todos.append(x)
+                except: pass
+        print(f'[Cartera] Total documentos pendientes: {len(todos)}')
+        return jsonify(todos), 200
     except Exception as e:
         print(f'[Cartera] ERROR: {e}')
         return jsonify({'error': str(e)}), 500
